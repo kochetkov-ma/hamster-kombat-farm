@@ -11,14 +11,14 @@ object GameLaunchAction {
     private val logger = KotlinLogging.logger {}
 
     fun fastReload() {
-        val hm = HamsterKombatGameView()
+        val hm = HamsterKombatGameView
         hm.navigationBlock.settings.click()
         hm.navigationBlock.reload.click()
         waitLoading()
     }
 
     fun waitLoading() {
-        val hm = HamsterKombatGameView()
+        val hm = HamsterKombatGameView
         logger.info { "Lading..." }
         runCatching {
             hm.startBlock.roadmap.should(Condition.appear)
@@ -32,7 +32,7 @@ object GameLaunchAction {
     }
 
     fun load() {
-        val tg = TelegramAppView()
+        val tg = TelegramAppView
 
         tg.playButton.click()
         waitLoading()
@@ -41,8 +41,8 @@ object GameLaunchAction {
     fun reload() {
         logger.info { "Try to reload game session..." }
 
-        val tg = TelegramAppView()
-        val hm = HamsterKombatGameView()
+        val tg = TelegramAppView
+        val hm = HamsterKombatGameView
 
         tg.playButton.click()
         hm.hamsterButton.should(Condition.disappear)

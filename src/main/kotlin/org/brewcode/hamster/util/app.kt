@@ -13,30 +13,26 @@ import kotlin.time.toJavaDuration
 
 val logger = KotlinLogging.logger {}
 
+// setAppPackage("org.telegram.messenger")
+// setAppActivity("org.telegram.ui.LaunchActivity")
 fun configureSession() {
 
-    // automationName UiAutomator2
-    // platformName Android
-    // {
-    //  "automationName": "UiAutomator2",
-    //  "platformName": "Android"
-    // }
-
     val options = UiAutomator2Options()
+        .setAutomationName("UiAutomator2")
         .setDeviceName("emulator-5554")
         .setPlatformName("Android")
         .setPlatformVersion("14")
-        .setNewCommandTimeout(2.minutes.toJavaDuration())
-//        .setAppPackage("org.telegram.messenger")
-//        .setAppActivity("org.telegram.ui.LaunchActivity")
+        .setNewCommandTimeout(5.minutes.toJavaDuration())
 
     val driver = AndroidDriver(URL("http://127.0.0.1:4723"), options)
     WebDriverRunner.setWebDriver(driver)
+
     Configuration.timeout = 10.seconds.inWholeMilliseconds
+    Configuration.pollingInterval = 200
+
     Runtime.getRuntime().addShutdownHook(Thread {
         Selenide.closeWebDriver()
     })
 
-    Configuration.pollingInterval = 250
-    logger.info { "Session started" }
+    logger.info { "Session started\n${options.toJson().toJson()}" }
 }

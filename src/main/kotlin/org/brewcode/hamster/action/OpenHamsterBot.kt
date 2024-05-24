@@ -14,7 +14,7 @@ object OpenHamsterBot {
     private val logger = KotlinLogging.logger {}
 
     fun closeTelegram() {
-        val telegramView = TelegramAppView()
+        val telegramView = TelegramAppView
         var i = 0
         while (telegramView.goBack.has(Condition.visible) && i < 5) {
             telegramView.goBack.click()
@@ -25,7 +25,7 @@ object OpenHamsterBot {
     }
 
     fun openTelegram() {
-        val telegramView = TelegramAppView()
+        val telegramView = TelegramAppView
 
         if (telegramView.telegramApp.has(Condition.visible)) {
             logger.info { "Telegram opening." }
@@ -34,8 +34,8 @@ object OpenHamsterBot {
     }
 
     fun openHamsterBot(): Boolean {
-        val telegramView = TelegramAppView()
-        val hamsterView = HamsterKombatGameView()
+        val telegramView = TelegramAppView
+        val hamsterView = HamsterKombatGameView
 
         if (hamsterView.hamsterButton.has(hidden)) {
             logger.info { "Bot is not open. Try to find it..." }

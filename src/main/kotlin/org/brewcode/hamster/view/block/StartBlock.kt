@@ -3,7 +3,7 @@ package org.brewcode.hamster.view.block
 import com.codeborne.selenide.Selenide.element
 import io.appium.java_client.AppiumBy.ByAndroidUIAutomator
 
-class StartBlock {
+object StartBlock {
 
     val thanksButton = element(ByAndroidUIAutomator("new UiSelector().textContains(\"Thank\")")) // Спасибо
     val roadmap = element(ByAndroidUIAutomator("new UiSelector().textContains(\"Roadmap\")"))

@@ -16,10 +16,11 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 const val availableBoostLevel = 0
-val timeout = 7.hours
+val timeout = 1.hours
 const val staminaCheckPeriod = 5
 const val staminaMinimumLevel = 500
 val staminaWaitInterval = 10.minutes
+val buy_something = true
 
 private val logger = KotlinLogging.logger {}
 
@@ -34,9 +35,9 @@ fun main() {
     if (openHamsterBot())
         load()
 
-    val hamsterView = HamsterKombatGameView()
+    val hamsterView = HamsterKombatGameView
     val now = LocalDateTime.now()
-    val initAmount = hamsterView.amount()
+    val initAmount = hamsterView.coinsAmount()
 
     var statistic = ExecutionStatistic(timeout)
     logger.info { "Start with timeout: $timeout at '$now' | Amount $initAmount" }
@@ -52,7 +53,7 @@ fun main() {
         }
     }
 
-    val profit = hamsterView.amount() - initAmount
-    logger.info { "Finished at '$now' | Clicks: ${statistic.iterations * staminaCheckPeriod * 5} | Amount: ${hamsterView.amount()} | Profit: $profit | Speed: ${profit / (statistic.elapsedMs / 1000)} coins/sec" }
+    val profit = hamsterView.coinsAmount() - initAmount
+    logger.info { "Finished at '$now' | Clicks: ${statistic.iterations * staminaCheckPeriod * 5} | Amount: ${hamsterView.coinsAmount()} | Profit: $profit | Speed: ${profit / (statistic.elapsedMs / 1000)} coins/sec" }
 }
 

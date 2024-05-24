@@ -13,7 +13,7 @@ object GameBoostAction {
 
     fun boostStamina(): Boolean {
 
-        val hm = HamsterKombatGameView()
+        val hm = HamsterKombatGameView
         hm.boostButton.click()
         val available = hm.available()
 
@@ -27,22 +27,25 @@ object GameBoostAction {
             }.onFailure {
                 it.printStackTrace()
                 logger.info { "Boost not applied because cooldown: ${it.localizedMessage}. Go back..." }
-                hm.navigationBlock.backButton.click()
             }
 
             return runCatching {
                 hm.commonBlock.applyButton.should(Condition.hidden, 4.seconds.toJavaDuration())
+                GameCommonAction.goToExchange()
                 return true
             }.onFailure {
                 logger.info { "Boost not applied go back due to error: ${it.localizedMessage}. Go back..." }
                 hm.navigationBlock.backButton.click()
-                hm.navigationBlock.backButton.click()
+                GameCommonAction.goToExchange()
                 return false
-            }.getOrElse { false }
+            }.getOrElse {
+                GameCommonAction.goToExchange()
+                false
+            }
 
         } else {
             logger.info { "Boost not available $available..." }
-            hm.navigationBlock.backButton.click()
+            GameCommonAction.goToExchange()
             return false
         }
     }
