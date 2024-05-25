@@ -19,12 +19,12 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 const val availableBoostLevel = 0
-val timeout = 5.hours
+val timeout = 8.hours
 const val staminaCheckPeriod = 5
 const val staminaMinimumLevel = 250
-val staminaWaitInterval = 5.minutes
+val staminaWaitInterval = 10.minutes
 val buy_something = true
-val min_cost = 20_000
+val min_cost = 1_000
 val auto_move_mouse = true
 val target_upgrade = ""
 

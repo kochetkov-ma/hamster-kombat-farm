@@ -77,7 +77,7 @@ object UpgradeService {
         info.writeText(currentUpgrades.toJson())
     }
 
-    fun calculateTarget(amount: Int, buySomething: Boolean = false, exclude: Set<String> = emptySet(), minCost: Int = 0, targetUpgrade: String = ""): Upgrade {
+    fun calculateTarget(amount: Int, buySomething: Boolean = false, minCost: Int = 0, targetUpgrade: String = "", exclude: Set<String> = emptySet()): Upgrade {
 
         val allHaveRelativelyForNextLLevel = currentUpgrades.values.all { it.relativeProfit > 0 }
 
@@ -126,6 +126,7 @@ data class Upgrade(
 
     @get:JsonProperty
     val totalMargin: Double get() = if (cost != 0) totalProfit.toDouble() / cost else 0.0
+
     @get:JsonProperty
     val relativeTotalMargin: Double get() = if (cost != 0) relativeProfit.toDouble() / cost else 0.0
 
@@ -134,7 +135,7 @@ data class Upgrade(
     }
 
     override fun toString(): String {
-        return "Upgrade($section > $name[$$level] -$$cost +$$totalProfit, relativeTotalMargin=$relativeTotalMargin, totalMargin=$totalMargin, relativeProfit=$relativeProfit, timer='$timer', isUnlocked=$isUnlocked, needText='$needText')"
+        return "Upgrade($section > $name[lvl $level] -$$cost +$$totalProfit, relativeTotalMargin=$relativeTotalMargin, totalMargin=$totalMargin, relativeProfit=$relativeProfit, timer='$timer', isUnlocked=$isUnlocked, needText='$needText')"
     }
 
 }

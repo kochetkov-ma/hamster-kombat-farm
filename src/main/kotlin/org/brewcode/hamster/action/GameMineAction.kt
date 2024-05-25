@@ -114,7 +114,7 @@ object GameMineAction {
             }
             GameCommonAction.goToExchange()
             coins = coinsAmount()
-            toBuy = calculateTarget(coins, buySomething, exclude)
+            toBuy = calculateTarget(coins, buySomething, minCost = minCost, targetUpgrade = targetUpgrade, exclude = exclude)
         }
 
         logger.info { "Not enough coins [$coins / ${toBuy.cost}] for: $toBuy" }
