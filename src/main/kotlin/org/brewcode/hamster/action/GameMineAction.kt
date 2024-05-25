@@ -51,15 +51,11 @@ object GameMineAction {
     }
 
     fun buyUpgradeCard(upgrade: Upgrade): Upgrade {
-        var card: SmallUpgradeCard? = findSmallCard(upgrade.name)
+        var card: SmallUpgradeCard? = findSmallCard(upgrade)
         var index = 0
-        while (MainView.hamsterButton.has(Condition.hidden) && index < 10) {
+        while (MainView.hamsterButton.has(Condition.hidden) && index < 10 && card == null) {
             scrollToLastVisibleCard()
-            card = findSmallCard(upgrade.name)
-            if (card != null) {
-
-                break
-            }
+            card = findSmallCard(upgrade)
             index++
         }
 
@@ -72,10 +68,11 @@ object GameMineAction {
         card.openCard()
         MineView.confirm.actionButton.shouldBe(Condition.visible)
 
-        if (MineView.confirm.actionButton.text == "Insufficient funds") {
-            logger.info { "Insufficient Funds! Need update data: $upgrade" }
+        val btnText = MineView.confirm.actionButton.text
+        if (btnText != "Go ahead") {
+            logger.info { "Button: $btnText! Need update data or wait: $upgrade" }
             goToBack()
-            return card.toUpgrade(upgrade)
+            return upgrade
         }
 
         MineView.confirm.actionButton.click()
@@ -94,12 +91,17 @@ object GameMineAction {
         GameCommonAction.goToExchange()
         var coins = coinsAmount()
         var toBuy = calculateTarget(coins, buySomething)
+        val exclude = mutableSetOf<String>()
         while (coins >= toBuy.cost) {
             logger.info { "Have money for upgrade [$coins / ${toBuy.cost}]: $toBuy" }
-            buyUpgrade(toBuy)
+            val result = buyUpgrade(toBuy)
+            if (!result) {
+                logger.info { "Buy upgrade fail... Add to exclude" }
+                exclude.add(toBuy.name)
+            }
             GameCommonAction.goToExchange()
             coins = coinsAmount()
-            toBuy = calculateTarget(coins, buySomething)
+            toBuy = calculateTarget(coins, buySomething, exclude)
         }
 
         logger.info { "Not enough coins [$coins / ${toBuy.cost}] for: $toBuy" }

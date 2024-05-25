@@ -27,13 +27,13 @@ data class Retryer(
                 mainAction()
                 return
             } catch (err: Throwable) {
+                attempts++
+
                 logger.error { "Evaluation '$name' error: ${err.localizedMessage}" }
                 sleep(delay)
 
                 runCatching { onFailAction(err) }
                     .onFailure { logger.error { "Evaluate '$name' on-fail action: ${it.localizedMessage}" } }
-
-                attempts++
             }
         }
 

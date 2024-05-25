@@ -49,16 +49,16 @@ object MineView : GameView() {
         val lastVisibleIndex = visibleCards.indexOf(lastVisible)
 
         lastVisible.scrollTo(TopMenuBlock.self)
-        logger.info { "Cards count $visibleCards. Last visible has index $lastVisibleIndex. Scroll successful!" }
+        logger.info { "Last visible has index $lastVisibleIndex of ${visibleCards.size()}. Scroll successful!" }
     }
 
-    fun findSmallCard(searchName: String): SmallUpgradeCard? {
+    fun findSmallCard(upgrade: Upgrade): SmallUpgradeCard? {
         val tmp = cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
 
         return (1..tmp.size())
-            .map { i -> SmallUpgradeCard(UpgradeSection.Markets, X.cardsXpath.xIndex(i)) }
+            .map { i -> SmallUpgradeCard(upgrade.section, X.cardsXpath.xIndex(i)) }
             .filter { it.name.isDisplayed && it.level.isDisplayed }
-            .find { it.name.text == searchName }
-            .also { logger.info { "Card found: $searchName" } }
+            .find { it.name.text == upgrade.name }
+            ?.also { logger.info { "Card found: ${upgrade.name}" } }
     }
 }

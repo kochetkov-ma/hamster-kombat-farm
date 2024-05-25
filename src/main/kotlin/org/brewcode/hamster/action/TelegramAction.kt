@@ -7,21 +7,33 @@ import io.appium.java_client.android.AndroidDriver
 import io.appium.java_client.android.nativekey.AndroidKey
 import io.appium.java_client.android.nativekey.KeyEvent
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.brewcode.hamster.action.TelegramAction.closeTelegram
+import org.brewcode.hamster.util.Retryer.Companion.retry
+import org.brewcode.hamster.util.configureSession
 import org.brewcode.hamster.view.main.MainView
 import org.brewcode.hamster.view.tg.TelegramView
 
-object OpenHamsterBot {
+object TelegramAction {
     private val logger = KotlinLogging.logger {}
 
     fun closeTelegram() {
-        val telegramView = TelegramView
         var i = 0
-        while (telegramView.goBack.has(Condition.visible) && i < 5) {
-            telegramView.goBack.click()
+        while (TelegramView.goBack.isDisplayed && i < 5) {
+            logger.info { "Go Back Telegram..." }
+            runCatching { TelegramView.goBack.click() }
             i++
         }
 
-        (WebDriverRunner.getWebDriver() as AndroidDriver).pressKey(KeyEvent(AndroidKey.HOME))
+        retry("Close Telegram")
+            .maxAttempts(2)
+            .delay(500)
+            .action {
+                logger.info { "Closing Telegram..." }
+                (WebDriverRunner.getWebDriver() as AndroidDriver).pressKey(KeyEvent(AndroidKey.HOME))
+                TelegramView.searchInput.should(hidden)
+                logger.info { "Telegram Closed!" }
+            }
+            .evaluate()
     }
 
     fun openTelegram() {
@@ -49,4 +61,9 @@ object OpenHamsterBot {
         logger.info { "Bot already open!" }
         return false
     }
+}
+
+fun main() {
+    configureSession()
+    closeTelegram()
 }

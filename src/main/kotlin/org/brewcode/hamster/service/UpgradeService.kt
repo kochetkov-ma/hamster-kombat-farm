@@ -54,9 +54,10 @@ object UpgradeService {
         info.writeText(currentUpgrades.toJson())
     }
 
-    fun calculateTarget(amount: Int, buySomething: Boolean = false): Upgrade {
+    fun calculateTarget(amount: Int, buySomething: Boolean = false, exclude: Set<String> = emptySet()): Upgrade {
 
         val res = currentUpgrades
+            .filterKeys { it !in exclude }
             .filterValues { if (buySomething) it.cost <= amount else true }
             .filterValues(Upgrade::isUnlocked)
             .filterValues { it.needText.isBlank() && it.needUpgrade == null }
@@ -65,20 +66,20 @@ object UpgradeService {
         return res
     }
 
-    fun buyUpgrade(upgrade: Upgrade) {
+    fun buyUpgrade(upgrade: Upgrade): Boolean {
         GameCommonAction.goToMine()
         goToSection(upgrade.section)
         val newUpgrade = buyUpgradeCard(upgrade)
         currentUpgrades[upgrade.name] = newUpgrade
 
         info.writeText(currentUpgrades.toJson())
+        return newUpgrade != upgrade
     }
 }
 
 data class Upgrade(
     val section: UpgradeSection,
     val name: String,
-    val index: Int,
     val level: Int,
     val totalProfit: Int,
     val relativeProfit: Int,
@@ -94,7 +95,7 @@ data class Upgrade(
     val totalMargin = if (cost != 0) totalProfit / cost else 0
 
     companion object {
-        val empty = Upgrade(Markets, "", 0, 0, 0, 0, 0, "")
+        val empty = Upgrade(Markets, "", 0, 0, 0, 0, "")
     }
 
 }

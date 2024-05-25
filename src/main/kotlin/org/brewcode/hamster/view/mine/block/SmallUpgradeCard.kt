@@ -19,7 +19,8 @@ data class SmallUpgradeCard(
     val needs = element(xpath(selfXpath.xChild("android.widget.TextView[4]")))
 
     fun openCard() {
-        self.click()
+        runCatching { name.click() }
+            .onFailure { level.click() }
     }
 
     fun toUpgrade(from: Upgrade = Upgrade.empty, extName: String = ""): Upgrade {

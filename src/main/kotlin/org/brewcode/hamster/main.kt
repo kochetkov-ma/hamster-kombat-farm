@@ -3,23 +3,26 @@ package org.brewcode.hamster
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.action.ExecutionStatistic
 import org.brewcode.hamster.action.GameFarmAction.farm
-import org.brewcode.hamster.action.GameLaunchAction.fastReload
-import org.brewcode.hamster.action.GameLaunchAction.load
-import org.brewcode.hamster.action.OpenHamsterBot.closeTelegram
-import org.brewcode.hamster.action.OpenHamsterBot.openHamsterBot
-import org.brewcode.hamster.action.OpenHamsterBot.openTelegram
+import org.brewcode.hamster.action.GameLaunchAction.loadTheGameFromBotChat
+import org.brewcode.hamster.action.GameLaunchAction.reload
+import org.brewcode.hamster.action.MoverAction
+import org.brewcode.hamster.action.TelegramAction.closeTelegram
+import org.brewcode.hamster.action.TelegramAction.openHamsterBot
+import org.brewcode.hamster.action.TelegramAction.openTelegram
 import org.brewcode.hamster.util.Retryer.Companion.retry
 import org.brewcode.hamster.util.configureSession
 import org.brewcode.hamster.view.main.MainView
+import java.lang.Thread.sleep
 import java.time.LocalDateTime
+import java.util.concurrent.CompletableFuture
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 const val availableBoostLevel = 0
 val timeout = 5.hours
 const val staminaCheckPeriod = 5
-const val staminaMinimumLevel = 500
-val staminaWaitInterval = 10.minutes
+const val staminaMinimumLevel = 250
+val staminaWaitInterval = 5.minutes
 val buy_something = true
 
 private val logger = KotlinLogging.logger {}
@@ -31,9 +34,16 @@ fun main() {
 
     configureSession()
 
+    CompletableFuture.runAsync {
+        while (true) {
+            sleep(1.minutes.inWholeMilliseconds)
+            MoverAction.mouseMove()
+        }
+    }
+
     openTelegram()
     if (openHamsterBot())
-        load()
+        loadTheGameFromBotChat()
 
     val hamsterView = MainView
     val now = LocalDateTime.now()
@@ -43,17 +53,17 @@ fun main() {
     logger.info { "Start with timeout: $timeout at '$now' | Amount $initAmount" }
 
     retry("Main loop with Telegram reopening")
-        .maxAttempts(5)
+        .maxAttempts(10)
         .onFail {
             closeTelegram()
             openTelegram()
             if (openHamsterBot())
-                load()
+                loadTheGameFromBotChat()
         }
         .action {
             retry("Farming loop with fast reload")
-                .maxAttempts(5)
-                .onFail { fastReload() }
+                .maxAttempts(2)
+                .onFail { reload() }
                 .action { statistic = farm(statistic) }
                 .evaluate()
         }
