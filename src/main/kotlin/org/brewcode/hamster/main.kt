@@ -24,6 +24,8 @@ const val staminaCheckPeriod = 5
 const val staminaMinimumLevel = 250
 val staminaWaitInterval = 5.minutes
 val buy_something = true
+val min_cost = 10_000
+val auto_move_mouse = true
 
 private val logger = KotlinLogging.logger {}
 
@@ -34,12 +36,13 @@ fun main() {
 
     configureSession()
 
-    CompletableFuture.runAsync {
-        while (true) {
-            sleep(1.minutes.inWholeMilliseconds)
-            MoverAction.mouseMove()
+    if (auto_move_mouse)
+        CompletableFuture.runAsync {
+            while (true) {
+                sleep(1.minutes.inWholeMilliseconds)
+                MoverAction.mouseMove()
+            }
         }
-    }
 
     openTelegram()
     if (openHamsterBot())

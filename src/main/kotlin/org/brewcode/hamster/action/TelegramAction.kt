@@ -37,11 +37,12 @@ object TelegramAction {
     }
 
     fun openTelegram() {
-        val telegramView = TelegramView
 
-        if (telegramView.telegramApp.has(Condition.visible)) {
-            logger.info { "Telegram opening." }
-            telegramView.telegramApp.click()
+        if (TelegramView.telegramApp.has(Condition.visible)) {
+            logger.info { "Telegram opening..." }
+            TelegramView.telegramApp.click()
+            TelegramView.searchButton.should(Condition.visible)
+            logger.info { "Telegram opened!" }
         }
     }
 

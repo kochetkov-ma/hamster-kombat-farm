@@ -18,8 +18,9 @@ object GameLaunchAction {
             .maxAttempts(2)
             .onFail {
                 TelegramAction.closeTelegram()
-                TelegramAction.openHamsterBot()
-                loadTheGameFromBotChat()
+                TelegramAction.openTelegram()
+                if (TelegramAction.openHamsterBot())
+                    loadTheGameFromBotChat()
             }
             .action { if (fast) reloadBySettings() else reloadByPlay() }
             .evaluate()
@@ -27,7 +28,7 @@ object GameLaunchAction {
     }
 
     fun loadTheGameFromBotChat() {
-        TelegramView.playButton.click()
+        TelegramView.playOneCLickButton.click()
         waitLoading()
     }
 
@@ -38,7 +39,7 @@ object GameLaunchAction {
     }
 
     fun reloadByPlay() {
-        TelegramView.playButton.click()
+        TelegramView.playOneCLickButton.click()
         MainView.hamsterButton.should(Condition.disappear)
         loadTheGameFromBotChat()
     }
@@ -48,9 +49,10 @@ object GameLaunchAction {
     private fun waitLoading() {
         val hm = MainView
         logger.info { "Lading..." }
+        Thread.sleep(2_500)
 
-        hm.startBlock.roadmap.should(Condition.appear)
-        hm.hamsterButton.should(Condition.appear, 60.seconds.toJavaDuration())
+        hm.startBlock.roadmap.should(Condition.disappear, 60.seconds.toJavaDuration())
+        hm.hamsterButton.should(Condition.appear)
         logger.info { "Loaded successfully" }
 
         hm.startBlock.thanksButton.click()

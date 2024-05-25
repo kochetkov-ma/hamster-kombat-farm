@@ -82,7 +82,7 @@ object GameMineAction {
         return card.toUpgrade(upgrade)
     }
 
-    fun chooseAndBuyUpgrades(buySomething: Boolean = false) {
+    fun chooseAndBuyUpgrades(buySomething: Boolean = false, minCost: Int = 0) {
         loadUpgrades()
 
         if (UpgradeService.isEmptyUpgradesCache)
@@ -90,7 +90,7 @@ object GameMineAction {
 
         GameCommonAction.goToExchange()
         var coins = coinsAmount()
-        var toBuy = calculateTarget(coins, buySomething)
+        var toBuy = calculateTarget(coins, buySomething, minCost = minCost)
         val exclude = mutableSetOf<String>()
         while (coins >= toBuy.cost) {
             logger.info { "Have money for upgrade [$coins / ${toBuy.cost}]: $toBuy" }

@@ -54,11 +54,11 @@ object UpgradeService {
         info.writeText(currentUpgrades.toJson())
     }
 
-    fun calculateTarget(amount: Int, buySomething: Boolean = false, exclude: Set<String> = emptySet()): Upgrade {
+    fun calculateTarget(amount: Int, buySomething: Boolean = false, exclude: Set<String> = emptySet(), minCost: Int = 0): Upgrade {
 
         val res = currentUpgrades
             .filterKeys { it !in exclude }
-            .filterValues { if (buySomething) it.cost <= amount else true }
+            .filterValues { if (buySomething) it.cost in minCost..amount else true }
             .filterValues(Upgrade::isUnlocked)
             .filterValues { it.needText.isBlank() && it.needUpgrade == null }
             .maxBy { it.value.totalMargin }.value

@@ -3,16 +3,13 @@ package org.brewcode.hamster.action
 import com.codeborne.selenide.Condition
 import com.codeborne.selenide.Condition.text
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.brewcode.hamster.*
 import org.brewcode.hamster.action.GameBoostAction.boostStamina
 import org.brewcode.hamster.action.GameCommonAction.goToBack
 import org.brewcode.hamster.action.GameCommonAction.goToExchange
 import org.brewcode.hamster.action.GameEarnAction.tryDailyEarn
 import org.brewcode.hamster.action.GameMineAction.chooseAndBuyUpgrades
-import org.brewcode.hamster.buy_something
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
-import org.brewcode.hamster.staminaCheckPeriod
-import org.brewcode.hamster.staminaMinimumLevel
-import org.brewcode.hamster.staminaWaitInterval
 import org.brewcode.hamster.util.Retryer.Companion.retry
 import org.brewcode.hamster.view.main.MainView
 import org.brewcode.hamster.view.tg.TelegramView
@@ -63,16 +60,17 @@ object GameFarmAction {
                             retry("Choose and buy upgrades")
                                 .ignoreErrors()
                                 .onFail {
-                                    if (TelegramView.searchInput.isDisplayed) {
+                                    if (TelegramView.searchButton.isDisplayed || TelegramView.searchInput.isDisplayed) {
                                         logger.info { "Game crushed and now Telegram view open" }
                                         TelegramAction.closeTelegram()
-                                        TelegramAction.openHamsterBot()
-                                        GameLaunchAction.loadTheGameFromBotChat()
+                                        TelegramAction.openTelegram()
+                                        if (TelegramAction.openHamsterBot())
+                                            GameLaunchAction.loadTheGameFromBotChat()
                                     } else goToBack()
 
                                     goToExchange()
                                 }
-                                .action { chooseAndBuyUpgrades(buy_something) }
+                                .action { chooseAndBuyUpgrades(buy_something, min_cost) }
                                 .evaluate()
 
                             if (currentStatic.iterations % (staminaCheckPeriod * 5) == 0)

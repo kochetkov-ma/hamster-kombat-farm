@@ -31,4 +31,8 @@ fun String.money() = when (last().uppercaseChar()) {
     else -> double()
 }.toInt()
 
-
+fun Throwable.rootCause(): Throwable {
+    var cause = this
+    while (cause.cause != null) cause = cause.cause!!
+    return cause
+}
