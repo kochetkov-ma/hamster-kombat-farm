@@ -5,60 +5,89 @@ import com.codeborne.selenide.Condition
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.service.Upgrade
 import org.brewcode.hamster.service.UpgradeSection
+import org.brewcode.hamster.service.UpgradeSection.Companion.isSpecial
 import org.brewcode.hamster.util.*
 import org.brewcode.hamster.view.base.GameView
-import org.brewcode.hamster.view.mine.block.AdditionalMenuBlock
-import org.brewcode.hamster.view.mine.block.SmallUpgradeCard
-import org.brewcode.hamster.view.mine.block.TopMenuBlock
-import org.brewcode.hamster.view.mine.block.UpgradeCardBlock
+import org.brewcode.hamster.view.mine.MineView.X.cardsXpath
+import org.brewcode.hamster.view.mine.MineView.X.specialCardsXpath
+import org.brewcode.hamster.view.mine.MineView.readSmallCards
+import org.brewcode.hamster.view.mine.block.*
 
-val logger = KotlinLogging.logger {}
+private val logger = KotlinLogging.logger {}
 
 object MineView : GameView() {
 
     object X {
         val cardsSectionXpath = TopMenuBlock.X.menuSectionXpath.xSibling(1)
         val cardsXpath = cardsSectionXpath.xChild("android.view.View")
+        val specialCardsXpath = cardsXpath.xChild("android.view.View").xChild("android.view.View")
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     val topMenuBlock = TopMenuBlock
     val additionalMenuBlock = AdditionalMenuBlock
-    val cards = elements(X.cardsXpath.xBy())
+    val cards = elements(cardsXpath.xBy())
+    val specialCards = elements(specialCardsXpath.xBy())
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     fun upgradeCardBlock(upgrade: Upgrade): UpgradeCardBlock = UpgradeCardBlock(upgrade.name, upgrade)
 
     fun readSmallCards(section: UpgradeSection, searchName: String = "", exclude: Collection<String> = emptyList()): Map<String, Upgrade> {
-        val tmp = cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
+        val tmp =
+            if (section.isSpecial) specialCards.shouldHave(CollectionCondition.sizeGreaterThan(0))
+            else cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
 
         return (1..tmp.size())
-            .map { i -> SmallUpgradeCard(section, X.cardsXpath.xIndex(i)) }
+            .map { i ->
+                if (section.isSpecial)
+                    if (SmallSpecialWihTimerUpgradeCard.isSpecialWihTimer(specialCardsXpath.xIndex(i)))
+                        SmallSpecialWihTimerUpgradeCard(section, specialCardsXpath.xIndex(i))
+                    else
+                        SmallSpecialUpgradeCard(section, specialCardsXpath.xIndex(i))
+                else SmallUpgradeCard(section, cardsXpath.xIndex(i))
+            }
             .filter { it.level.isDisplayed }
-            .associateBy { it.name.text.also { logger.info { "Cards saved: $it" } } }
+            .associateBy { it.name.text.also { logger.info { "Upgrade card saved: $it" } } }
             .filterKeys { it.contains(searchName) && it !in exclude }
             .map { it.key to it.value.toUpgrade(extName = it.key) }
             .toMap()
     }
 
-    fun scrollToLastVisibleCard() {
-        val visibleCards = cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
+    fun scrollToLastVisibleCard(section: UpgradeSection) {
+        val visibleCards =
+            if (section.isSpecial) specialCards.shouldHave(CollectionCondition.sizeGreaterThan(0))
+            else cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
+
         val lastVisible = visibleCards.filter(Condition.visible).last()
         val lastVisibleIndex = visibleCards.indexOf(lastVisible)
 
         lastVisible.scrollTo(TopMenuBlock.self)
-        logger.info { "Last visible has index $lastVisibleIndex of ${visibleCards.size()}. Scroll successful!" }
+        logger.debug { "Last visible has index $lastVisibleIndex of ${visibleCards.size()}. Scroll successful!" }
     }
 
     fun findSmallCard(upgrade: Upgrade): SmallUpgradeCard? {
-        val tmp = cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
+        val tmp =
+            if (upgrade.section in arrayOf(UpgradeSection.SpecialsMy, UpgradeSection.SpecialsNew)) specialCards.shouldHave(CollectionCondition.sizeGreaterThan(0))
+            else cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
 
         return (1..tmp.size())
-            .map { i -> SmallUpgradeCard(upgrade.section, X.cardsXpath.xIndex(i)) }
+            .map { i ->
+                if (upgrade.section.isSpecial)
+                    if (SmallSpecialWihTimerUpgradeCard.isSpecialWihTimer(specialCardsXpath.xIndex(i)))
+                        SmallSpecialWihTimerUpgradeCard(upgrade.section, specialCardsXpath.xIndex(i))
+                    else
+                        SmallSpecialUpgradeCard(upgrade.section, specialCardsXpath.xIndex(i))
+                else SmallUpgradeCard(upgrade.section, cardsXpath.xIndex(i))
+            }
             .filter { it.name.isDisplayed && it.level.isDisplayed }
             .find { it.name.text == upgrade.name }
             ?.also { logger.info { "Card found: ${upgrade.name}" } }
     }
+}
+
+fun main() {
+    configureSession()
+    readSmallCards(UpgradeSection.SpecialsMy)
 }

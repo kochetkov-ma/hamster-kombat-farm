@@ -11,6 +11,7 @@ import org.brewcode.hamster.action.GameEarnAction.tryDailyEarn
 import org.brewcode.hamster.action.GameMineAction.chooseAndBuyUpgrades
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
 import org.brewcode.hamster.util.Retryer.Companion.retry
+import org.brewcode.hamster.util.progress
 import org.brewcode.hamster.view.main.MainView
 import org.brewcode.hamster.view.tg.TelegramView
 import kotlin.time.toJavaDuration
@@ -48,19 +49,18 @@ object GameFarmAction {
 
                         if (MainView.staminaLevel().first < staminaMinimumLevel + 500) {
                             val max = MainView.staminaLevel().second
-                            logger.info { "Try wait till entire refresh..." }
 
                             retry("Try daily earn")
                                 .noRetry()
                                 .ignoreErrors()
-                                .onFail { logger.info { "Daily error : " + it.localizedMessage } }
+                                .onFail { logger.info { "Daily error : " + it.message } }
                                 .action { tryDailyEarn() }
                                 .evaluate()
 
                             retry("Choose and buy upgrades")
                                 .ignoreErrors()
                                 .onFail {
-                                    if (TelegramView.searchButton.isDisplayed || TelegramView.searchInput.isDisplayed) {
+                                    if (TelegramView.searchButton.isDisplayed || TelegramView.searchInput.isDisplayed || TelegramView.playButton.isDisplayed) {
                                         logger.info { "Game crushed and now Telegram view open" }
                                         TelegramAction.closeTelegram()
                                         TelegramAction.openTelegram()
@@ -70,14 +70,21 @@ object GameFarmAction {
 
                                     goToExchange()
                                 }
-                                .action { chooseAndBuyUpgrades(buy_something, min_cost) }
+                                .action { chooseAndBuyUpgrades(buy_something, min_cost, target_upgrade) }
                                 .evaluate()
 
                             if (currentStatic.iterations % (staminaCheckPeriod * 5) == 0)
                                 updateUpgrades()
 
+                            logger.info { "Wait [$staminaWaitInterval] till entire refresh..." }
+
+                            val control = progress()
+
                             runCatching { MainView.staminaText.shouldBe(text("$max / $max"), staminaWaitInterval.toJavaDuration()) }
-                                .onFailure { logger.error { "Stamina is " + MainView.staminaLevel() + " after long wait " + staminaWaitInterval } }
+                                .onFailure {
+                                    logger.error { "Stamina is " + MainView.staminaLevel() + " after long wait " + staminaWaitInterval }
+                                    control.set(false)
+                                }.onSuccess { control.set(false) }
                         }
                     }
                 }

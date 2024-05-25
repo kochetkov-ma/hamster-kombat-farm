@@ -1,8 +1,8 @@
 package org.brewcode.hamster.action
 
 import com.codeborne.selenide.Condition
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.action.GameCommonAction.goToBack
-import org.brewcode.hamster.action.GameMineAction.chooseAndBuyUpgrades
 import org.brewcode.hamster.service.Upgrade
 import org.brewcode.hamster.service.UpgradeSection
 import org.brewcode.hamster.service.UpgradeService
@@ -10,7 +10,6 @@ import org.brewcode.hamster.service.UpgradeService.buyUpgrade
 import org.brewcode.hamster.service.UpgradeService.calculateTarget
 import org.brewcode.hamster.service.UpgradeService.loadUpgrades
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
-import org.brewcode.hamster.util.configureSession
 import org.brewcode.hamster.view.main.MainView
 import org.brewcode.hamster.view.main.MainView.coinsAmount
 import org.brewcode.hamster.view.mine.MineView
@@ -20,6 +19,8 @@ import org.brewcode.hamster.view.mine.MineView.scrollToLastVisibleCard
 import org.brewcode.hamster.view.mine.block.SmallUpgradeCard
 
 object GameMineAction {
+
+    private val logger = KotlinLogging.logger {}
 
     fun goToSection(section: UpgradeSection) {
         when (section) {
@@ -35,6 +36,8 @@ object GameMineAction {
                 MineView.topMenuBlock.specials.click()
                 MineView.additionalMenuBlock.newCards.click()
             }
+
+            UpgradeSection.None -> throw IllegalArgumentException("Cannot go to section: $section")
         }
     }
 
@@ -42,7 +45,7 @@ object GameMineAction {
         val map = readSmallCards(section).toMutableMap()
         var index = 0
         while (MainView.hamsterButton.has(Condition.hidden) && index < 10) {
-            scrollToLastVisibleCard()
+            scrollToLastVisibleCard(section)
             map.putAll(readSmallCards(section, exclude = map.keys))
             index++
         }
@@ -54,45 +57,55 @@ object GameMineAction {
         var card: SmallUpgradeCard? = findSmallCard(upgrade)
         var index = 0
         while (MainView.hamsterButton.has(Condition.hidden) && index < 10 && card == null) {
-            scrollToLastVisibleCard()
+            scrollToLastVisibleCard(upgrade.section)
             card = findSmallCard(upgrade)
             index++
         }
 
         if (card == null) {
-            UpgradeService.remove(upgrade)
-            logger.info { "Cannot find card for $upgrade" }
+            logger.error { "Cannot find card for $upgrade" }
             return upgrade
         }
 
-        card.openCard()
-        MineView.confirm.actionButton.shouldBe(Condition.visible)
+        try {
+            card.openCard()
+        } catch (err: Throwable) {
+            logger.error { "Cannot open card for $upgrade" }
+            return upgrade
+        }
 
         val btnText = MineView.confirm.actionButton.text
         if (btnText != "Go ahead") {
-            logger.info { "Button: $btnText! Need update data or wait: $upgrade" }
+            logger.info { "Button: ${btnText.ifBlank { ". . ." }}! Need update data or wait: $upgrade" }
             goToBack()
             return upgrade
         }
 
         MineView.confirm.actionButton.click()
-        MineView.confirm.actionButton.shouldBe(Condition.hidden)
+        runCatching { MineView.confirm.actionButton.shouldBe(Condition.hidden) }
+            .onFailure {
+                if (MineView.confirm.actionButton.text.contains("Take the prize"))
+                    MineView.confirm.actionButton.click()
+                else
+                    throw it
+            }
+
 
         logger.info { "Bought upgrade! $upgrade" }
         return card.toUpgrade(upgrade)
     }
 
-    fun chooseAndBuyUpgrades(buySomething: Boolean = false, minCost: Int = 0) {
+    fun chooseAndBuyUpgrades(buySomething: Boolean = false, minCost: Int = 0, targetUpgrade: String = "") {
         loadUpgrades()
 
         if (UpgradeService.isEmptyUpgradesCache)
             updateUpgrades()
 
-        GameCommonAction.goToExchange()
+        runCatching { GameCommonAction.goToExchange() }
         var coins = coinsAmount()
-        var toBuy = calculateTarget(coins, buySomething, minCost = minCost)
+        var toBuy = calculateTarget(coins, buySomething, minCost = minCost, targetUpgrade = targetUpgrade)
         val exclude = mutableSetOf<String>()
-        while (coins >= toBuy.cost) {
+        while (coins >= toBuy.cost && toBuy != Upgrade.none) {
             logger.info { "Have money for upgrade [$coins / ${toBuy.cost}]: $toBuy" }
             val result = buyUpgrade(toBuy)
             if (!result) {
@@ -107,9 +120,4 @@ object GameMineAction {
         logger.info { "Not enough coins [$coins / ${toBuy.cost}] for: $toBuy" }
         GameCommonAction.goToExchange()
     }
-}
-
-fun main() {
-    configureSession()
-    chooseAndBuyUpgrades(true)
 }

@@ -53,7 +53,6 @@ object GameLaunchAction {
 
         hm.startBlock.roadmap.should(Condition.disappear, 60.seconds.toJavaDuration())
         hm.hamsterButton.should(Condition.appear)
-        logger.info { "Loaded successfully" }
 
         hm.startBlock.thanksButton.click()
         logger.info { "Thanks took!" }

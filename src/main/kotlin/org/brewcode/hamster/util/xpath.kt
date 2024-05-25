@@ -15,6 +15,7 @@ fun String.xSibling(index: Int) = "$this/following-sibling::*[$index]"
 
 fun String.xChild(tag: String) = "$this/$tag"
 fun String.xChildTxt(text: String, tag: String = "*") = "$this/$tag[text()='$text']"
+fun String.xChildTxtContains(text: String, tag: String = "*") = "$this/$tag[contains(text(), '$text')]"
 fun String.xAnyChild(tag: String) = "$this//$tag"
 fun String.xLastDescendant(tag: String = "*") = "$this//descendant::$tag[last()]"
 

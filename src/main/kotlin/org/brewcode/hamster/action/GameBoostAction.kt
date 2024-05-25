@@ -24,7 +24,7 @@ object GameBoostAction {
                 runCatching { MainView.common.goAheadButton.shouldBe(Condition.visible, 4.seconds.toJavaDuration()) }
                     .onSuccess { MainView.common.goAheadButton.click() }
             }.onFailure {
-                logger.error { "Boost not applied because cooldown: ${it.localizedMessage}. Go back..." }
+                logger.error { "Boost not applied because cooldown: ${it.message}. Go back..." }
             }
 
             return runCatching {
@@ -32,7 +32,7 @@ object GameBoostAction {
                 GameCommonAction.goToExchange()
                 return true
             }.onFailure {
-                logger.error { "Boost not applied go back due to error: ${it.localizedMessage}. Go back..." }
+                logger.error { "Boost not applied go back due to error: ${it.message}. Go back..." }
                 MainView.navigation.backButton.click()
                 GameCommonAction.goToExchange()
                 return false

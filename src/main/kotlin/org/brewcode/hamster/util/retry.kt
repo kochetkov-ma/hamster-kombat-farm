@@ -1,8 +1,9 @@
 package org.brewcode.hamster.util
 
 import com.codeborne.selenide.Selenide.sleep
-import com.fasterxml.jackson.databind.util.ExceptionUtil
-import io.opentelemetry.sdk.internal.ThrowableUtil
+import io.github.oshai.kotlinlogging.KotlinLogging
+
+private val logger = KotlinLogging.logger {}
 
 data class Retryer(
     val name: String = "",
@@ -31,11 +32,11 @@ data class Retryer(
             } catch (err: Throwable) {
                 attempts++
 
-                logger.error(err.rootCause()) { "Evaluation '$name' error: ${err.localizedMessage}" }
+                logger.error { "Evaluation '$name' error: $err\n > > > ${err.rootCause().message}" }
                 sleep(delay)
 
                 runCatching { onFailAction(err) }
-                    .onFailure { logger.error(it.rootCause()) { "Evaluate '$name' on-fail action: ${it.localizedMessage}" } }
+                    .onFailure { logger.error { "Evaluate '$name' on-fail action: ${it.message}\n > > > ${err.rootCause().message}" } }
             }
         }
 

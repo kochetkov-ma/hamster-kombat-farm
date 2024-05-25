@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import kotlin.time.Duration
 
-val logger = KotlinLogging.logger {}
+private val logger = KotlinLogging.logger {}
 
 typealias JDuration = java.time.Duration
 

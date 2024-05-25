@@ -1,12 +1,13 @@
 package org.brewcode.hamster.action
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.awt.AWTException
 import java.awt.Robot
-import java.time.LocalDateTime
 import java.util.concurrent.ThreadLocalRandom
 
 object MoverAction {
 
+    private val logger = KotlinLogging.logger {}
     private val myRobot = robot()
 
     @Throws(AWTException::class)
@@ -19,15 +20,12 @@ object MoverAction {
     }
 
     fun mouseMove(robot: Robot = myRobot) {
-        println("Moving starting at: " + LocalDateTime.now())
-
         robot.mouseMove(ThreadLocalRandom.current().nextInt(0, 100), ThreadLocalRandom.current().nextInt(0, 100))
         robot.delay(ThreadLocalRandom.current().nextInt(1000, 2000))
 
         robot.mouseMove(ThreadLocalRandom.current().nextInt(100, 1000), ThreadLocalRandom.current().nextInt(100, 1000))
         robot.delay(ThreadLocalRandom.current().nextInt(1000, 2000))
 
-        println("Moving finished at: " + LocalDateTime.now())
+        logger.info { "Mouse moved!" }
     }
-
 }

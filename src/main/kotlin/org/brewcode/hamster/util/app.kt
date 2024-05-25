@@ -6,15 +6,12 @@ import com.codeborne.selenide.WebDriverRunner
 import io.appium.java_client.android.AndroidDriver
 import io.appium.java_client.android.options.UiAutomator2Options
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.brewcode.hamster.action.MoverAction
-import java.lang.Thread.sleep
 import java.net.URL
-import java.util.concurrent.CompletableFuture
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
-val logger = KotlinLogging.logger {}
+private val logger = KotlinLogging.logger {}
 
 // setAppPackage("org.telegram.messenger")
 // setAppActivity("org.telegram.ui.LaunchActivity")

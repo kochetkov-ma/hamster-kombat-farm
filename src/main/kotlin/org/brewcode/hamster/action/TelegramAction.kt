@@ -38,7 +38,7 @@ object TelegramAction {
 
     fun openTelegram() {
 
-        if (TelegramView.telegramApp.has(Condition.visible)) {
+        if (TelegramView.telegramApp.isDisplayed) {
             logger.info { "Telegram opening..." }
             TelegramView.telegramApp.click()
             TelegramView.searchButton.should(Condition.visible)
@@ -50,17 +50,26 @@ object TelegramAction {
         val telegramView = TelegramView
         val hamsterView = MainView
 
-        if (hamsterView.hamsterButton.has(hidden)) {
-            logger.info { "Bot is not open. Try to find it..." }
-            telegramView.searchButton.click()
-            telegramView.searchInput.sendKeys("@hamster_kombat_bot")
-            telegramView.hamsterItem.click()
-            logger.info { "Bot open." }
+        val isInGame = hamsterView.hamsterButton.isDisplayed
+        val isInBotChat = hamsterView.hamsterButton.isDisplayed
+
+        if (isInGame) {
+            logger.info { "Bot already open!" }
+            return false
+        }
+
+        if (isInBotChat) {
+            logger.info { "Bot open!" }
             return true
         }
 
-        logger.info { "Bot already open!" }
-        return false
+        logger.info { "Bot is not open. Try to find it..." }
+        telegramView.searchButton.click()
+        telegramView.searchInput.sendKeys("@hamster_kombat_bot")
+        telegramView.hamsterItem.click()
+        logger.info { "Bot open!" }
+
+        return true
     }
 }
 
