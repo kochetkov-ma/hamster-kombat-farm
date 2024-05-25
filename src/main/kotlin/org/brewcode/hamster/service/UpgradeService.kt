@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.action.GameCommonAction
 import org.brewcode.hamster.action.GameMineAction.buyUpgradeCard
-import org.brewcode.hamster.action.GameMineAction.chooseAndBuyUpgrades
 import org.brewcode.hamster.action.GameMineAction.goToSection
 import org.brewcode.hamster.action.GameMineAction.loadCards
 import org.brewcode.hamster.service.UpgradeSection.*
