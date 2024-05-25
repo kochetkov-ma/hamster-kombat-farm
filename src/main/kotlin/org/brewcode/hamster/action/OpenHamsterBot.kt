@@ -7,14 +7,14 @@ import io.appium.java_client.android.AndroidDriver
 import io.appium.java_client.android.nativekey.AndroidKey
 import io.appium.java_client.android.nativekey.KeyEvent
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.brewcode.hamster.view.HamsterKombatGameView
-import org.brewcode.hamster.view.TelegramAppView
+import org.brewcode.hamster.view.main.MainView
+import org.brewcode.hamster.view.tg.TelegramView
 
 object OpenHamsterBot {
     private val logger = KotlinLogging.logger {}
 
     fun closeTelegram() {
-        val telegramView = TelegramAppView
+        val telegramView = TelegramView
         var i = 0
         while (telegramView.goBack.has(Condition.visible) && i < 5) {
             telegramView.goBack.click()
@@ -25,7 +25,7 @@ object OpenHamsterBot {
     }
 
     fun openTelegram() {
-        val telegramView = TelegramAppView
+        val telegramView = TelegramView
 
         if (telegramView.telegramApp.has(Condition.visible)) {
             logger.info { "Telegram opening." }
@@ -34,8 +34,8 @@ object OpenHamsterBot {
     }
 
     fun openHamsterBot(): Boolean {
-        val telegramView = TelegramAppView
-        val hamsterView = HamsterKombatGameView
+        val telegramView = TelegramView
+        val hamsterView = MainView
 
         if (hamsterView.hamsterButton.has(hidden)) {
             logger.info { "Bot is not open. Try to find it..." }

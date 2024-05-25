@@ -1,23 +1,28 @@
 package org.brewcode.hamster.action
 
 import com.codeborne.selenide.Condition
-import org.brewcode.hamster.view.HamsterKombatGameView
-import org.brewcode.hamster.view.MineView
+import org.brewcode.hamster.view.earn.EarnView
+import org.brewcode.hamster.view.main.MainView
+import org.brewcode.hamster.view.mine.MineView
 
 object GameCommonAction {
 
+    fun goToBack() {
+        MainView.navigation.backButton.click()
+    }
+
     fun goToExchange() {
-        HamsterKombatGameView.bottomMenuBlock.exchange.click()
-        HamsterKombatGameView.hamsterButton.shouldBe(Condition.visible)
+        MainView.bottomMenu.exchange.click()
+        MainView.hamsterButton.shouldBe(Condition.visible)
     }
 
     fun goToMine() {
-        HamsterKombatGameView.bottomMenuBlock.mine.click()
+        MainView.bottomMenu.mine.click()
         MineView.topMenuBlock.self.shouldBe(Condition.visible)
     }
 
     fun goToEarn() {
-        HamsterKombatGameView.bottomMenuBlock.earn.click()
-        HamsterKombatGameView.earnBlock.daily.shouldBe(Condition.visible)
+        MainView.bottomMenu.earn.click()
+        EarnView.daily.shouldBe(Condition.visible)
     }
 }

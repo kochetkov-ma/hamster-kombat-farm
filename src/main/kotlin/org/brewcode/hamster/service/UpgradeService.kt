@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.action.GameCommonAction
 import org.brewcode.hamster.action.GameMineAction.buyUpgradeCard
+import org.brewcode.hamster.action.GameMineAction.chooseAndBuyUpgrades
 import org.brewcode.hamster.action.GameMineAction.goToSection
 import org.brewcode.hamster.action.GameMineAction.loadCards
 import org.brewcode.hamster.service.UpgradeSection.*
+import org.brewcode.hamster.service.UpgradeService.updateUpgrades
+import org.brewcode.hamster.util.configureSession
 import org.brewcode.hamster.util.fromJson
 import org.brewcode.hamster.util.toJson
 import kotlin.io.path.Path
@@ -36,15 +39,15 @@ object UpgradeService {
 
         logger.info { "Read upgrade section: $Markets" }
         goToSection(Markets)
-        currentUpgrades.putAll(loadCards())
+        currentUpgrades.putAll(loadCards(Markets))
 
         logger.info { "Read upgrade section: $PrTeam" }
         goToSection(PrTeam)
-        currentUpgrades.putAll(loadCards())
+        currentUpgrades.putAll(loadCards(PrTeam))
 
         logger.info { "Read upgrade section: $Legal" }
         goToSection(Legal)
-        currentUpgrades.putAll(loadCards())
+        currentUpgrades.putAll(loadCards(Legal))
 
         logger.info { "All section read successfully" }
         GameCommonAction.goToExchange()
@@ -57,7 +60,7 @@ object UpgradeService {
         val res = currentUpgrades
             .filterValues { if (buySomething) it.cost <= amount else true }
             .filterValues(Upgrade::isUnlocked)
-            .filterValues { it.needUpgrade == null }
+            .filterValues { it.needText.isBlank() && it.needUpgrade == null }
             .maxBy { it.value.totalMargin }.value
         logger.info { "Current total coins: $amount .Target upgrade: $res " }
         return res
@@ -72,7 +75,6 @@ object UpgradeService {
         info.writeText(currentUpgrades.toJson())
     }
 }
-
 
 data class Upgrade(
     val section: UpgradeSection,
@@ -104,4 +106,9 @@ enum class UpgradeSection(vararg path: String) {
     Legal("Legal"),
     SpecialsMy("Specials", "My cards"),
     SpecialsNew("Specials", "New cards")
+}
+
+fun main() {
+    configureSession()
+    updateUpgrades()
 }

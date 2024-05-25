@@ -1,28 +1,23 @@
-package org.brewcode.hamster.view
+package org.brewcode.hamster.view.main
 
 import com.codeborne.selenide.Selenide.element
 import io.appium.java_client.AppiumBy.ByAndroidUIAutomator
 import io.appium.java_client.AppiumBy.xpath
 import org.brewcode.hamster.util.*
-import org.brewcode.hamster.view.block.*
+import org.brewcode.hamster.view.base.GameView
 
-object HamsterKombatGameView {
+object MainView : GameView() {
 
-    private val boostXpath = "Boost Boost".xpathDesc
-    val app = element(xpath(".//android.webkit.WebView[@text=\"Hamster Kombat\"]"))
-    val hamsterButton = element(app).find(boostXpath.parent.child("android.widget.Button").x)
-    val staminaText = element(app).find(boostXpath.siblingPrev(1, "android.widget.TextView").x)
+    private val boostXpath = xDesc("Boost Boost")
+    val hamsterButton = element(app).find(boostXpath.xParent.xChild("android.widget.Button").xBy())
+    val staminaText = element(app).find(boostXpath.xSiblingPrev(1, "android.widget.TextView").xBy())
     val amountText = element(app).find(xpath("(.//android.widget.ListView/following-sibling::android.view.View/android.widget.Image/following-sibling::android.widget.TextView)[1]"))
-    val boostButton = element(boostXpath.x)
-    val availableButton = element(ByAndroidUIAutomator("new UiSelector().textContains(\"available\")")) // доступно
+    val boostButton = element(boostXpath.xBy())
+    val availableButton = element(ByAndroidUIAutomator("new UiSelector().textContains(\"available\")"))
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     val startBlock = StartBlock
-    val commonBlock = CommonBlock
-    val navigationBlock = NavigationBlock
-    val bottomMenuBlock = BottomMenuBlock
-    val earnBlock = EarnBlock
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

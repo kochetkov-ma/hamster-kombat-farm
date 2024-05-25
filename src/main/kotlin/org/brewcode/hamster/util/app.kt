@@ -28,7 +28,7 @@ fun configureSession() {
     WebDriverRunner.setWebDriver(driver)
 
     Configuration.timeout = 10.seconds.inWholeMilliseconds
-    Configuration.pollingInterval = 200
+    Configuration.pollingInterval = 500
 
     Runtime.getRuntime().addShutdownHook(Thread {
         Selenide.closeWebDriver()

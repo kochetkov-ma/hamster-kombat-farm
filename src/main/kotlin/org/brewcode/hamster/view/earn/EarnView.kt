@@ -1,11 +1,12 @@
-package org.brewcode.hamster.view.block
+package org.brewcode.hamster.view.earn
 
 import com.codeborne.selenide.Condition
 import com.codeborne.selenide.Selenide
 import io.appium.java_client.AppiumBy.ByAndroidUIAutomator
+import org.brewcode.hamster.view.base.GameView
 import org.openqa.selenium.By
 
-object EarnBlock {
+object EarnView: GameView() {
 
     val daily = Selenide.element(ByAndroidUIAutomator("new UiSelector().text(\"Daily reward\")"))
     val applyButton =

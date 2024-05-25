@@ -2,8 +2,8 @@ package org.brewcode.hamster.action
 
 import com.codeborne.selenide.Condition
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.brewcode.hamster.view.HamsterKombatGameView
-import org.brewcode.hamster.view.TelegramAppView
+import org.brewcode.hamster.view.main.MainView
+import org.brewcode.hamster.view.tg.TelegramView
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
@@ -11,14 +11,13 @@ object GameLaunchAction {
     private val logger = KotlinLogging.logger {}
 
     fun fastReload() {
-        val hm = HamsterKombatGameView
-        hm.navigationBlock.settings.click()
-        hm.navigationBlock.reload.click()
+        MainView.navigation.settings.click()
+        MainView.navigation.reload.click()
         waitLoading()
     }
 
     fun waitLoading() {
-        val hm = HamsterKombatGameView
+        val hm = MainView
         logger.info { "Lading..." }
         runCatching {
             hm.startBlock.roadmap.should(Condition.appear)
@@ -32,7 +31,7 @@ object GameLaunchAction {
     }
 
     fun load() {
-        val tg = TelegramAppView
+        val tg = TelegramView
 
         tg.playButton.click()
         waitLoading()
@@ -41,8 +40,8 @@ object GameLaunchAction {
     fun reload() {
         logger.info { "Try to reload game session..." }
 
-        val tg = TelegramAppView
-        val hm = HamsterKombatGameView
+        val tg = TelegramView
+        val hm = MainView
 
         tg.playButton.click()
         hm.hamsterButton.should(Condition.disappear)

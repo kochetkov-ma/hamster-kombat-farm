@@ -2,7 +2,9 @@ package org.brewcode.hamster.action
 
 import com.codeborne.selenide.Condition
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.brewcode.hamster.view.HamsterKombatGameView
+import org.brewcode.hamster.action.GameCommonAction.goToEarn
+import org.brewcode.hamster.view.earn.EarnView
+import org.brewcode.hamster.view.main.MainView
 import java.time.LocalDate
 import kotlin.io.path.Path
 import kotlin.io.path.exists
@@ -27,13 +29,14 @@ object GameEarnAction {
             return false
         }
 
-        val hm = HamsterKombatGameView
-        hm.bottomMenuBlock.earn.click()
-        hm.earnBlock.daily.click()
+        val hm = MainView
+        goToEarn()
+        EarnView.daily.click()
 
-        val result = if (hm.earnBlock.isDailyAvailable) {
-            hm.earnBlock.applyButton.click()
-            hm.earnBlock.applyButton.should(Condition.hidden)
+        val result = if (EarnView.isDailyAvailable) {
+            EarnView.applyButton.click()
+            EarnView.applyButton.should(Condition.hidden)
+
             info.writeText(LocalDate.now().toString())
             logger.info { "Daily award got. Last award was: " + info.readText() }
             true
@@ -42,6 +45,7 @@ object GameEarnAction {
             false
         }
 
+        GameCommonAction.goToBack()
         GameCommonAction.goToExchange()
         return result
     }

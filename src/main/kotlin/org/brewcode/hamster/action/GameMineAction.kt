@@ -1,6 +1,7 @@
 package org.brewcode.hamster.action
 
 import com.codeborne.selenide.Condition
+import org.brewcode.hamster.action.GameCommonAction.goToBack
 import org.brewcode.hamster.action.GameMineAction.chooseAndBuyUpgrades
 import org.brewcode.hamster.service.Upgrade
 import org.brewcode.hamster.service.UpgradeSection
@@ -10,16 +11,13 @@ import org.brewcode.hamster.service.UpgradeService.calculateTarget
 import org.brewcode.hamster.service.UpgradeService.loadUpgrades
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
 import org.brewcode.hamster.util.configureSession
-import org.brewcode.hamster.view.HamsterKombatGameView
-import org.brewcode.hamster.view.HamsterKombatGameView.coinsAmount
-import org.brewcode.hamster.view.MineView
-import org.brewcode.hamster.view.MineView.findSmallCard
-import org.brewcode.hamster.view.MineView.readSmallCards
-import org.brewcode.hamster.view.SmallUpgradeCard
-import org.brewcode.hamster.view.block.CommonBlock
-import org.brewcode.hamster.view.block.CommonBlock.insufficientFunds
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.toJavaDuration
+import org.brewcode.hamster.view.main.MainView
+import org.brewcode.hamster.view.main.MainView.coinsAmount
+import org.brewcode.hamster.view.mine.MineView
+import org.brewcode.hamster.view.mine.MineView.findSmallCard
+import org.brewcode.hamster.view.mine.MineView.readSmallCards
+import org.brewcode.hamster.view.mine.MineView.scrollToLastVisibleCard
+import org.brewcode.hamster.view.mine.block.SmallUpgradeCard
 
 object GameMineAction {
 
@@ -40,12 +38,12 @@ object GameMineAction {
         }
     }
 
-    fun loadCards(): HashMap<String, Upgrade> {
-        val map = HashMap<String, Upgrade>()
-
+    fun loadCards(section: UpgradeSection): MutableMap<String, Upgrade> {
+        val map = readSmallCards(section).toMutableMap()
         var index = 0
-        while (HamsterKombatGameView.hamsterButton.has(Condition.hidden) && index < 10) {
-            map.putAll(readSmallCards(exclude = map.keys))
+        while (MainView.hamsterButton.has(Condition.hidden) && index < 10) {
+            scrollToLastVisibleCard()
+            map.putAll(readSmallCards(section, exclude = map.keys))
             index++
         }
 
@@ -53,11 +51,15 @@ object GameMineAction {
     }
 
     fun buyUpgradeCard(upgrade: Upgrade): Upgrade {
-        var card: SmallUpgradeCard? = null
+        var card: SmallUpgradeCard? = findSmallCard(upgrade.name)
         var index = 0
-        while (HamsterKombatGameView.hamsterButton.has(Condition.hidden) && index < 10) {
+        while (MainView.hamsterButton.has(Condition.hidden) && index < 10) {
+            scrollToLastVisibleCard()
             card = findSmallCard(upgrade.name)
-            if (card != null) break
+            if (card != null) {
+
+                break
+            }
             index++
         }
 
@@ -67,19 +69,19 @@ object GameMineAction {
             return upgrade
         }
 
-        logger.info { "Card found for $upgrade" }
-
         card.openCard()
-        if (insufficientFunds.isDisplayed) {
+        MineView.confirm.actionButton.shouldBe(Condition.visible)
+
+        if (MineView.confirm.actionButton.text == "Insufficient funds") {
             logger.info { "Insufficient Funds! Need update data: $upgrade" }
+            goToBack()
             return card.toUpgrade(upgrade)
         }
 
-        CommonBlock.applyButton.click()
-        CommonBlock.applyButtonDiv.shouldBe(Condition.hidden, 30.seconds.toJavaDuration())
+        MineView.confirm.actionButton.click()
+        MineView.confirm.actionButton.shouldBe(Condition.hidden)
 
         logger.info { "Bought upgrade! $upgrade" }
-
         return card.toUpgrade(upgrade)
     }
 
@@ -107,6 +109,5 @@ object GameMineAction {
 
 fun main() {
     configureSession()
-
     chooseAndBuyUpgrades(true)
 }

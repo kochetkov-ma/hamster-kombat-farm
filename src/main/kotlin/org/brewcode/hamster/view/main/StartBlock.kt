@@ -1,4 +1,4 @@
-package org.brewcode.hamster.view.block
+package org.brewcode.hamster.view.main
 
 import com.codeborne.selenide.Selenide.element
 import io.appium.java_client.AppiumBy.ByAndroidUIAutomator

@@ -1,9 +1,9 @@
-package org.brewcode.hamster.view
+package org.brewcode.hamster.view.tg
 
 import com.codeborne.selenide.Selenide.element
 import io.appium.java_client.AppiumBy
 
-object TelegramAppView {
+object TelegramView {
 
     val goBack = element(AppiumBy.ByAndroidUIAutomator("new UiSelector().description(\"Go back\")"))
     val telegramApp = element(AppiumBy.ByAndroidUIAutomator("new UiSelector().description(\"Telegram\")"))
