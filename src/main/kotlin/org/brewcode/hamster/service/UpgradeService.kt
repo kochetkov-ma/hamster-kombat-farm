@@ -8,7 +8,7 @@ import org.brewcode.hamster.action.GameMineAction.goToSection
 import org.brewcode.hamster.action.GameMineAction.loadCards
 import org.brewcode.hamster.service.UpgradeSection.*
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
-import org.brewcode.hamster.target_upgrade
+import org.brewcode.hamster.Cfg
 import org.brewcode.hamster.util.configureSession
 import org.brewcode.hamster.util.fromJson
 import org.brewcode.hamster.util.toJson
@@ -104,7 +104,7 @@ object UpgradeService {
 
         info.writeText(currentUpgrades.toJson())
         logger.info { "Upgrade next level will be: $newUpgrade" }
-        if (newUpgrade.name == target_upgrade)
+        if (newUpgrade.name == Cfg.target_upgrade)
             sessionTargetAlreadyBought = true
         return newUpgrade != upgrade
     }
@@ -131,13 +131,12 @@ data class Upgrade(
     val relativeTotalMargin: Double get() = if (cost != 0) relativeProfit.toDouble() / cost else 0.0
 
     companion object {
-        val none = Upgrade(Markets, "none", 0, 0, 0, 0, "")
+        val none = Upgrade(None, "none", 0, 0, 0, 0, "")
     }
 
     override fun toString(): String {
         return "Upgrade($section > $name[lvl $level] -$$cost +$$totalProfit, relativeTotalMargin=$relativeTotalMargin, totalMargin=$totalMargin, relativeProfit=$relativeProfit, timer='$timer', isUnlocked=$isUnlocked, needText='$needText')"
     }
-
 }
 
 enum class UpgradeSection(vararg path: String) {

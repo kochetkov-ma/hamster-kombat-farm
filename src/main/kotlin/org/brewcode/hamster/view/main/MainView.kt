@@ -11,9 +11,10 @@ object MainView : GameView() {
     private val boostXpath = xDesc("Boost Boost")
     val hamsterButton = element(app).find(boostXpath.xParent.xChild("android.widget.Button").xBy())
     val staminaText = element(app).find(boostXpath.xSiblingPrev(1, "android.widget.TextView").xBy())
-    val amountText = element(app).find(xpath("(.//android.widget.ListView/following-sibling::android.view.View/android.widget.Image/following-sibling::android.widget.TextView)[1]"))
+    val coinsText = element(app).find(xpath("(.//android.widget.ListView/following-sibling::android.view.View/android.widget.Image/following-sibling::android.widget.TextView)[1]"))
     val boostButton = element(boostXpath.xBy())
     val availableButton = element(ByAndroidUIAutomator("new UiSelector().textContains(\"available\")"))
+    val profit = element(xText("Profit per hour").xSibling(1).xChild("android.widget.TextView").xBy())
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -25,6 +26,6 @@ object MainView : GameView() {
     private val availableRegex = """(\d+)/(\d+).+""".toRegex()
 
     fun staminaLevel(): Pair<Int, Int> = staminaRegex.find(staminaText.text)?.destructured?.let { (current, max) -> current.toInt() to max.toInt() } ?: (0 to 0)
-    fun coinsAmount() = amountText.text.int()
+    fun coinsAmount() = coinsText.text.int()
     fun available() = availableRegex.find(availableButton.text)?.destructured?.let { (current, max) -> current.toInt() to max.toInt() } ?: (0 to 0)
 }

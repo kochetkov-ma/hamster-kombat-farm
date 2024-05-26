@@ -3,7 +3,6 @@ package org.brewcode.hamster.action
 
 import com.codeborne.selenide.Condition
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.brewcode.hamster.availableBoostLevel
 import org.brewcode.hamster.view.main.MainView
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
@@ -16,7 +15,7 @@ object GameBoostAction {
         MainView.boostButton.click()
         val available = MainView.available()
 
-        if (available.first > availableBoostLevel) {
+        if (available.first > 0) {
             logger.info { "Great! Boost available ($available) - using." }
 
             MainView.availableButton.click()
