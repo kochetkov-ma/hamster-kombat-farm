@@ -2,14 +2,15 @@ package org.brewcode.hamster.action
 
 import com.codeborne.selenide.Condition
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.brewcode.hamster.Cfg.upgrade_cost_factor
 import org.brewcode.hamster.action.GameCommonAction.goToBack
 import org.brewcode.hamster.service.Upgrade
 import org.brewcode.hamster.service.UpgradeSection
 import org.brewcode.hamster.service.UpgradeService
 import org.brewcode.hamster.service.UpgradeService.buyUpgrade
-import org.brewcode.hamster.service.UpgradeService.calculateTarget
 import org.brewcode.hamster.service.UpgradeService.loadUpgrades
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
+import org.brewcode.hamster.service.UpgradeService.upgradeToBuy
 import org.brewcode.hamster.view.main.MainView
 import org.brewcode.hamster.view.main.MainView.coinsAmount
 import org.brewcode.hamster.view.mine.MineView
@@ -92,10 +93,11 @@ object GameMineAction {
 
 
         logger.info { "Bought upgrade! $upgrade" }
+        UpgradeService.saveToHistory(upgrade)
         return card.toUpgrade(upgrade)
     }
 
-    fun chooseAndBuyUpgrades(buySomething: Boolean = false, minCost: Int = 0, targetUpgrade: String = "") {
+    fun chooseAndBuyUpgrades() {
         loadUpgrades()
 
         if (UpgradeService.isEmptyUpgradesCache)
@@ -103,21 +105,33 @@ object GameMineAction {
 
         runCatching { GameCommonAction.goToExchange() }
         var coins = coinsAmount()
-        var toBuy = calculateTarget(coins, buySomething, minCost = minCost, targetUpgrade = targetUpgrade)
-        val exclude = mutableSetOf<String>()
-        while (coins >= toBuy.cost && toBuy != Upgrade.none) {
+        val calculator = UpgradeService.upgradeCalculator()
+
+        var toBuy = if (UpgradeService.hasToBuy()) UpgradeService.toBuy() else calculator.calculate(coins)
+        if (toBuy.needSaveMoney(coins)) {
+            logger.info { "Found upgrade to need save coins a few iterations. Let's saving [$coins / ${toBuy.cost}] for: $toBuy" }
+            GameCommonAction.goToExchange()
+            UpgradeService.toBuy(toBuy)
+            return
+        }
+
+        while (toBuy.canBuy(coins)) {
             logger.info { "Have money for upgrade [$coins / ${toBuy.cost}]: $toBuy" }
-            val result = buyUpgrade(toBuy)
+
+            val result = runCatching { buyUpgrade(toBuy) }.getOrElse { false }.also { UpgradeService.clearToBuy() }
             if (!result) {
                 logger.info { "Buy upgrade fail... Add to exclude" }
-                exclude.add(toBuy.name)
+                calculator.exclude(toBuy.name)
             }
             GameCommonAction.goToExchange()
             coins = coinsAmount()
-            toBuy = calculateTarget(coins, buySomething, minCost = minCost, targetUpgrade = targetUpgrade, exclude = exclude)
+            toBuy = calculator.calculate(coins)
         }
 
         logger.info { "Not enough coins [$coins / ${toBuy.cost}] for: $toBuy" }
         GameCommonAction.goToExchange()
     }
+
+    private fun Upgrade.needSaveMoney(coins: Int) =  cost in coins..(coins * upgrade_cost_factor).toInt()
+    private fun Upgrade.canBuy(coins: Int) = cost <= coins && this != Upgrade.none
 }

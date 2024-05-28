@@ -25,10 +25,10 @@ data class ExecutionStatistic(
     val duration: Duration,
     val start: LocalDateTime = now,
     val end: LocalDateTime = MAX,
-    val iterations: Int = 0,
-    val clicks: Int = 0,
     val startCoins: Int = MainView.coinsAmount(),
     val startProfit: Int = MainView.profit.text.money(),
+    var iterations: Int = 0,
+    var clicks: Int = 0
 ) {
 
     val elapsedMs: Long get() = JDuration.between(start, now).toMillis()
@@ -38,13 +38,16 @@ data class ExecutionStatistic(
     val profitText get() = MainView.profit.text
     val profit get() = profitText.money()
     val profitEarned get() = profit - startProfit
-    val profitIncrementPer10Minutes get() = profitEarned / (10.minutes.inWholeMilliseconds)
-    val coinsPerSecond = profit / (elapsedMs + 1 / 1000)
+    val profitIncrementPer10Minutes get() = profitEarned / (elapsedMs.toDouble() / 10.minutes.inWholeMilliseconds)
+    val coinsPerSecond get() = coinsEarned / ((elapsedMs + 500) / 1000)
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    fun updateClicks(newClicks: Int = 1) = copy(clicks = clicks + newClicks)
-    fun updateIterations() = copy(iterations = iterations + 1)
+    fun updateClicks(newClicks: Int = 1) {
+        clicks += newClicks
+    }
+
+    fun updateIterations() = iterations++
     fun printStatistic() =
         println(
             " > > > execution: ${elapsedMs.sec} / ${remainingMs.sec} sec | profit:$profitText | earned profit:$profitEarned | profit increment per 10min:$profitIncrementPer10Minutes" +

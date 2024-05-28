@@ -3,42 +3,50 @@ package org.brewcode.hamster
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
+@Suppress("ConstPropertyName")
 object Cfg {
 
     /** Farming execution duration */
     val timeout = 8.hours
 
     /** Period of stamina check. Click iterations number */
-    const val staminaCheckPeriod = 5
+    const val stamina_check_period = 5
 
     /** Level of stamina/energy when stop clicking and do another tasks */
-    const val staminaMinimumLevel = 250
+    const val stamina_minimum_level = 250
 
     /** Wait duration for stamina/energy recover */
     val staminaWaitInterval = 10.minutes
 
     /**
-     * - true - If you don't have money for most profitable upgrade try find something much cheaper
-     * - false - If you don't have money for most profitable upgrade buy nothing and wait for more money
+     * Minimum cost of upgrade
      */
-    val buy_something = true
-
-    /**
-     * Minimum cost of upgrade to buy
-     */
-    val min_cost = 10_000
+    const val min_cost = 0
 
     /**
      * If your laptop is not connected to power source you can move mouse to prevent sleep mode.
      */
-    val auto_move_mouse = true
+    const val auto_move_mouse = false
 
     /**
      * Name of upgrade to buy and ignore others till buy. After reaching target_upgrade will buy others.
      */
-    val target_upgrade = ""
+    val desire_upgrades = emptyList<String>()
+
+    const val time_priority = false
+
+    const val upgrade_cost_factor = 4.0
 
     override fun toString(): String {
-        return "[timeout=$timeout, staminaCheckPeriod=$staminaCheckPeriod, staminaMinimumLevel=$staminaMinimumLevel, staminaWaitInterval=$staminaWaitInterval, buy_something=$buy_something, min_cost=$min_cost, auto_move_mouse=$auto_move_mouse, target_upgrade='$target_upgrade']"
+        return """
+        |timeout=$timeout
+        |staminaCheckPeriod=$stamina_check_period
+        |staminaMinimumLevel=$stamina_minimum_level
+        |staminaWaitInterval=$staminaWaitInterval
+        |upgrade_cost_factor=$upgrade_cost_factor
+        |min_cost=$min_cost
+        |auto_move_mouse=$auto_move_mouse
+        |target_upgrade='$desire_upgrades'
+    """.trimMargin()
     }
 }

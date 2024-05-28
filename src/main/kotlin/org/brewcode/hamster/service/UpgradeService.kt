@@ -2,33 +2,43 @@ package org.brewcode.hamster.service
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.brewcode.hamster.Cfg
 import org.brewcode.hamster.action.GameCommonAction
 import org.brewcode.hamster.action.GameMineAction.buyUpgradeCard
 import org.brewcode.hamster.action.GameMineAction.goToSection
 import org.brewcode.hamster.action.GameMineAction.loadCards
 import org.brewcode.hamster.service.UpgradeSection.*
+import org.brewcode.hamster.service.UpgradeService.loadUpgrades
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
-import org.brewcode.hamster.Cfg
 import org.brewcode.hamster.util.configureSession
 import org.brewcode.hamster.util.fromJson
 import org.brewcode.hamster.util.toJson
-import kotlin.io.path.Path
-import kotlin.io.path.exists
-import kotlin.io.path.readText
-import kotlin.io.path.writeText
+import java.time.LocalDateTime
+import kotlin.io.path.*
 
 private val logger = KotlinLogging.logger {}
 
 object UpgradeService {
 
     private val info = Path("build/upgrade.json").also { if (!it.exists()) it.writeText("") }
-
-    private var sessionTargetAlreadyBought = false
+    private val history = Path("build/history.json").also { if (!it.exists()) it.writeText("") }
     private var currentUpgrades = mutableMapOf<String, Upgrade>()
-
+    var upgradeToBuy: Upgrade? = null
+    val desireUpgrades = Cfg.desire_upgrades.toMutableList()
     val isEmptyUpgradesCache get() = currentUpgrades.isEmpty()
 
-    fun remove(upgrade: Upgrade) = currentUpgrades.remove(upgrade.name)
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    fun toBuy(upgrade: Upgrade) {
+        upgradeToBuy = upgrade
+    }
+
+    fun toBuy() = upgradeToBuy!!
+    fun hasToBuy() = upgradeToBuy != null
+    fun clearToBuy() {
+        desireUpgrades.remove(upgradeToBuy?.name)
+        upgradeToBuy = null
+    }
 
     fun loadUpgrades() {
         currentUpgrades = info.readText().let { if (it.isEmpty()) mutableMapOf() else it.fromJson<MutableMap<String, Upgrade>>() }
@@ -45,6 +55,11 @@ object UpgradeService {
 
             } ?: currentUpgrades.put(newName, newUpgrade)
         }
+    }
+
+    fun saveToFile() {
+        val sorted = currentUpgrades.toList().sortedBy { it.second.totalMargin }.reversed().toMap()
+        info.writeText(sorted.toJson())
     }
 
     fun updateUpgrades() {
@@ -74,26 +89,7 @@ object UpgradeService {
         logger.info { "All section read successfully" }
         GameCommonAction.goToExchange()
 
-        info.writeText(currentUpgrades.toJson())
-    }
-
-    fun calculateTarget(amount: Int, buySomething: Boolean = false, minCost: Int = 0, targetUpgrade: String = "", exclude: Set<String> = emptySet()): Upgrade {
-
-        val allHaveRelativelyForNextLLevel = currentUpgrades.values.all { it.relativeProfit > 0 }
-
-        val res = currentUpgrades
-            .filterKeys { if (targetUpgrade.isNotBlank() && !sessionTargetAlreadyBought) it == targetUpgrade else true }
-            .filterKeys { it !in exclude }
-            .filterValues { if (buySomething) it.cost in minCost..amount else true }
-            .filterValues(Upgrade::isUnlocked)
-            .filterValues { it.needText.isBlank() && it.needUpgrade == null }
-            .maxByOrNull {
-                val hasTimer = it.value.timer.isNotBlank()
-                val number = if (allHaveRelativelyForNextLLevel) it.value.relativeTotalMargin else it.value.totalMargin
-                if (hasTimer) number * 5 else number
-            }?.value ?: Upgrade.none
-        logger.info { "Current total coins: $amount. Target upgrade: $res " }
-        return res
+        saveToFile()
     }
 
     fun buyUpgrade(upgrade: Upgrade): Boolean {
@@ -102,13 +98,20 @@ object UpgradeService {
         val newUpgrade = buyUpgradeCard(upgrade)
         currentUpgrades[upgrade.name] = newUpgrade
 
-        info.writeText(currentUpgrades.toJson())
+        saveToFile()
         logger.info { "Upgrade next level will be: $newUpgrade" }
-        if (newUpgrade.name == Cfg.target_upgrade)
-            sessionTargetAlreadyBought = true
+
         return newUpgrade != upgrade
     }
+
+    fun saveToHistory(upgrade: Upgrade) {
+        history.appendText("\n \"${LocalDateTime.now()}\": ${upgrade.toJson()} ,")
+    }
+
+    fun upgradeCalculator() = UpgradeCalculator(currentUpgrades, desireUpgrades)
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 data class Upgrade(
     val section: UpgradeSection,
@@ -154,5 +157,6 @@ enum class UpgradeSection(vararg path: String) {
 
 fun main() {
     configureSession()
+    loadUpgrades()
     updateUpgrades()
 }
