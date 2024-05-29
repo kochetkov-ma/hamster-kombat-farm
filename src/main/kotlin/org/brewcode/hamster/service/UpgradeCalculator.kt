@@ -1,8 +1,10 @@
 package org.brewcode.hamster.service
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.brewcode.hamster.Cfg.exclude_upgrades
 import org.brewcode.hamster.Cfg.min_cost
 import org.brewcode.hamster.Cfg.time_priority
+import org.brewcode.hamster.Cfg.upgrade_cost_backpressure_factor
 import org.brewcode.hamster.Cfg.upgrade_cost_factor
 
 private val logger = KotlinLogging.logger {}
@@ -14,16 +16,21 @@ data class UpgradeCalculator(
     private val maxCostFactor: Double = upgrade_cost_factor
 ) {
 
-    private val exclude: MutableSet<String> = mutableSetOf()
+    private var costBackPressureFactor = 1.0
+    private val exclude: MutableSet<String> = exclude_upgrades.toMutableSet()
     private val desireUpgradesToBuy: MutableList<String> = desireUpgrades.toMutableList()
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    fun costBackPressureFactorUp() {
+        costBackPressureFactor *= upgrade_cost_backpressure_factor
+    }
 
     fun exclude(vararg upgrades: String) = exclude.addAll(upgrades)
 
     fun calculate(coins: Int): Upgrade {
 
-        val costRange = minCost..(coins * maxCostFactor).toInt()
+        val costRange = minCost..(coins.limit()).toInt()
         val hasDesireUpgradesToBuy = desireUpgradesToBuy.isNotEmpty()
 
         val filteredUpgrades = upgrades
@@ -43,7 +50,7 @@ data class UpgradeCalculator(
         val hitSmartRelative = mostProfitable.hasRelative()
         val smartFilteredAndSortedUpgrades = if (hitSmartRelative) filteredAndSortedUpgrades.filter { it.value.hasRelative() } else filteredAndSortedUpgrades
 
-        logger.info { "Calculating... Hit smart relative: ${mostProfitable.hasRelative()}. Suitable upgrades(${filteredUpgrades.size}): ${filteredUpgrades.values.shortString()}" }
+        logger.info { "Calculating... Hit smart relative: ${mostProfitable.hasRelative()}. Limit: $costRange. Suitable upgrades(${filteredUpgrades.size}): ${filteredUpgrades.values.shortString()}" }
 
         val target = smartFilteredAndSortedUpgrades.maxByOrNull {
             if (it.value.withTimerPriority())
@@ -58,7 +65,7 @@ data class UpgradeCalculator(
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    private fun Int.limit() = this * maxCostFactor / costBackPressureFactor
     private fun Upgrade.doesntNeedOtherUpgrade() = needText.isBlank() && needUpgrade == null
     private fun Upgrade.hasRelative() = relativeTotalMargin > 0
     private fun Upgrade.comparingValue(useRelative: Boolean = false) = if (useRelative) relativeTotalMargin else totalMargin

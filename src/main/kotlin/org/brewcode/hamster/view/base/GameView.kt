@@ -2,7 +2,8 @@ package org.brewcode.hamster.view.base
 
 import com.codeborne.selenide.Selenide.element
 import io.appium.java_client.AppiumBy.ByAndroidUIAutomator
-import org.brewcode.hamster.util.*
+import org.brewcode.hamster.util.xBy
+import org.brewcode.hamster.util.xText
 
 abstract class GameView {
 
@@ -14,7 +15,6 @@ abstract class GameView {
     val common = CommonBlock
     val navigation = NavigationBlock
     val bottomMenu = BottomMenuBlock
-    val confirm = ConfirmBlock
 
     object CommonBlock {
 
@@ -39,15 +39,5 @@ abstract class GameView {
         val airdrop = element(ByAndroidUIAutomator("new UiSelector().description(\"Airdrop\")"))
     }
 
-    object ConfirmBlock {
 
-        private object X {
-            val self = GameView.X.app.xLastDescendant("android.view.View").xParent
-        }
-
-        val self = element(X.self.xBy())
-        val closeButton = element(X.self.xSiblingPrev(1, "android.view.View").xBy())
-        val title = element(X.self.xChild("android.widget.TextView").xBy())
-        val actionButton = element(X.self.xChild("android.widget.Button").xBy())
-    }
 }

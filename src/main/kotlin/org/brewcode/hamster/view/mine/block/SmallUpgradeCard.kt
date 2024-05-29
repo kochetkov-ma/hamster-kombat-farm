@@ -4,7 +4,6 @@ import com.codeborne.selenide.Condition
 import org.brewcode.hamster.service.Upgrade
 import org.brewcode.hamster.service.UpgradeSection
 import org.brewcode.hamster.util.*
-import org.brewcode.hamster.view.mine.MineView
 import org.openqa.selenium.By.xpath
 
 open class SmallUpgradeCard(
@@ -22,7 +21,6 @@ open class SmallUpgradeCard(
     fun openCard() {
         runCatching { name.click() }
             .onFailure { level.click() }
-        MineView.confirm.actionButton.shouldBe(Condition.visible)
     }
 
     open fun toUpgrade(fromPreviousLevel: Upgrade = Upgrade.none, extName: String = ""): Upgrade = fromPreviousLevel

@@ -11,6 +11,7 @@ import org.brewcode.hamster.action.GameCommonAction.goToBack
 import org.brewcode.hamster.action.GameCommonAction.goToExchange
 import org.brewcode.hamster.action.GameEarnAction.tryDailyEarn
 import org.brewcode.hamster.action.GameMineAction.chooseAndBuyUpgrades
+import org.brewcode.hamster.service.UpgradeService
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
 import org.brewcode.hamster.util.Retryer.Companion.retry
 import org.brewcode.hamster.util.progress

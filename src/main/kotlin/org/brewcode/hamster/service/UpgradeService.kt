@@ -95,7 +95,9 @@ object UpgradeService {
     fun buyUpgrade(upgrade: Upgrade): Boolean {
         GameCommonAction.goToMine()
         goToSection(upgrade.section)
-        val newUpgrade = buyUpgradeCard(upgrade)
+        val newUpgrade = runCatching { buyUpgradeCard(upgrade) }
+            .onFailure { logger.error(it) { "Error during buy upgrade: $upgrade" } }
+            .getOrThrow()
         currentUpgrades[upgrade.name] = newUpgrade
 
         saveToFile()

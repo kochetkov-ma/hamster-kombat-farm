@@ -10,7 +10,7 @@ import org.brewcode.hamster.service.UpgradeService
 import org.brewcode.hamster.service.UpgradeService.buyUpgrade
 import org.brewcode.hamster.service.UpgradeService.loadUpgrades
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
-import org.brewcode.hamster.service.UpgradeService.upgradeToBuy
+import org.brewcode.hamster.util.configureSession
 import org.brewcode.hamster.view.main.MainView
 import org.brewcode.hamster.view.main.MainView.coinsAmount
 import org.brewcode.hamster.view.mine.MineView
@@ -18,6 +18,7 @@ import org.brewcode.hamster.view.mine.MineView.findSmallCard
 import org.brewcode.hamster.view.mine.MineView.readSmallCards
 import org.brewcode.hamster.view.mine.MineView.scrollToLastVisibleCard
 import org.brewcode.hamster.view.mine.block.SmallUpgradeCard
+import org.brewcode.hamster.view.mine.block.UpgradeFullCardBlock
 
 object GameMineAction {
 
@@ -75,23 +76,22 @@ object GameMineAction {
             return upgrade
         }
 
-        val btnText = MineView.confirm.actionButton.text
+        val fullCard = UpgradeFullCardBlock(upgrade.name)
+        fullCard.actionButton.shouldBe(Condition.visible)
+
+        val btnText = fullCard.actionButton.text
         if (btnText != "Go ahead") {
             logger.info { "Button: ${btnText.ifBlank { ". . ." }}! Need update data or wait: $upgrade" }
             goToBack()
             return upgrade
         }
 
-        MineView.confirm.actionButton.click()
-        runCatching { MineView.confirm.actionButton.shouldBe(Condition.hidden) }
-            .onFailure {
-                if (MineView.confirm.actionButton.text.contains("Take the prize"))
-                    MineView.confirm.actionButton.click()
-                else
-                    throw it
-            }
+        fullCard.actionButton.click()
+        if (fullCard.actionButton.isDisplayed)
+            runCatching { fullCard.actionButton.text == "Take the prize" }
+                .onSuccess { fullCard.actionButton.click() }
 
-
+        fullCard.actionButton.shouldBe(Condition.hidden)
         logger.info { "Bought upgrade! $upgrade" }
         UpgradeService.saveToHistory(upgrade)
         return card.toUpgrade(upgrade)
@@ -122,6 +122,7 @@ object GameMineAction {
             if (!result) {
                 logger.info { "Buy upgrade fail... Add to exclude" }
                 calculator.exclude(toBuy.name)
+                calculator.costBackPressureFactorUp()
             }
             GameCommonAction.goToExchange()
             coins = coinsAmount()
@@ -132,6 +133,12 @@ object GameMineAction {
         GameCommonAction.goToExchange()
     }
 
-    private fun Upgrade.needSaveMoney(coins: Int) =  cost in coins..(coins * upgrade_cost_factor).toInt()
+    private fun Upgrade.needSaveMoney(coins: Int) = cost in coins..(coins * upgrade_cost_factor).toInt()
     private fun Upgrade.canBuy(coins: Int) = cost <= coins && this != Upgrade.none
+}
+
+fun main() {
+    configureSession()
+    GameMineAction.buyUpgradeCard(Upgrade(UpgradeSection.PrTeam, "BTC pairs", 1, 1, 1, 1, ""))
+    // GameMineAction.buyUpgradeCard(Upgrade(UpgradeSection.PrTeam, "Tokenomics expert", 1, 1, 1, 1, ""))
 }

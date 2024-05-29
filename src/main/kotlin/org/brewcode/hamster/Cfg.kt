@@ -32,10 +32,12 @@ object Cfg {
      * Name of upgrade to buy and ignore others till buy. After reaching target_upgrade will buy others.
      */
     val desire_upgrades = emptyList<String>()
+    val exclude_upgrades = listOf("YouTube Gold Button")
 
     const val time_priority = false
 
-    const val upgrade_cost_factor = 4.0
+    const val upgrade_cost_factor = 2.0
+    const val upgrade_cost_backpressure_factor = 1.5
 
     override fun toString(): String {
         return """
