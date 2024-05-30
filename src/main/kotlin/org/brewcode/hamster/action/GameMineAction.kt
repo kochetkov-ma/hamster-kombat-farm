@@ -4,6 +4,7 @@ import com.codeborne.selenide.Condition
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.Cfg.upgrade_cost_factor
 import org.brewcode.hamster.action.GameCommonAction.goToBack
+import org.brewcode.hamster.action.GameMineAction.chooseAndBuyUpgrades
 import org.brewcode.hamster.service.Upgrade
 import org.brewcode.hamster.service.UpgradeSection
 import org.brewcode.hamster.service.UpgradeService
@@ -139,6 +140,7 @@ object GameMineAction {
 
 fun main() {
     configureSession()
-    GameMineAction.buyUpgradeCard(Upgrade(UpgradeSection.PrTeam, "BTC pairs", 1, 1, 1, 1, ""))
+    chooseAndBuyUpgrades()
+    // GameMineAction.buyUpgradeCard(Upgrade(UpgradeSection.PrTeam, "Meme coins", 1, 1, 1, 1, ""))
     // GameMineAction.buyUpgradeCard(Upgrade(UpgradeSection.PrTeam, "Tokenomics expert", 1, 1, 1, 1, ""))
 }

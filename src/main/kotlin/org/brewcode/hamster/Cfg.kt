@@ -31,7 +31,7 @@ object Cfg {
     /**
      * Name of upgrade to buy and ignore others till buy. After reaching target_upgrade will buy others.
      */
-    val desire_upgrades = emptyList<String>()
+    val desire_upgrades =  listOf<String>()
     val exclude_upgrades = listOf("YouTube Gold Button")
 
     const val time_priority = false

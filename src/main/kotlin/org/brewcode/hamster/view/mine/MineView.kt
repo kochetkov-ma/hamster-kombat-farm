@@ -10,6 +10,7 @@ import org.brewcode.hamster.util.*
 import org.brewcode.hamster.view.base.GameView
 import org.brewcode.hamster.view.mine.MineView.X.cardsXpath
 import org.brewcode.hamster.view.mine.MineView.X.specialCardsXpath
+import org.brewcode.hamster.view.mine.MineView.findSmallCard
 import org.brewcode.hamster.view.mine.MineView.readSmallCards
 import org.brewcode.hamster.view.mine.block.*
 
@@ -89,5 +90,5 @@ object MineView : GameView() {
 
 fun main() {
     configureSession()
-    readSmallCards(UpgradeSection.SpecialsMy)
+    findSmallCard(Upgrade.none.copy(section = UpgradeSection.Markets, name = "Meme coins"))
 }
