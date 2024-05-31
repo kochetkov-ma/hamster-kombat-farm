@@ -1,17 +1,20 @@
 package org.brewcode.hamster.action
 
-import com.codeborne.selenide.Condition
+import com.codeborne.selenide.Condition.*
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.Cfg.upgrade_cost_factor
 import org.brewcode.hamster.action.GameCommonAction.goToBack
-import org.brewcode.hamster.action.GameMineAction.chooseAndBuyUpgrades
+import org.brewcode.hamster.action.GameCommonAction.goToMine
+import org.brewcode.hamster.action.GameMineAction.goToSection
 import org.brewcode.hamster.service.Upgrade
 import org.brewcode.hamster.service.UpgradeSection
+import org.brewcode.hamster.service.UpgradeSection.*
 import org.brewcode.hamster.service.UpgradeService
 import org.brewcode.hamster.service.UpgradeService.buyUpgrade
 import org.brewcode.hamster.service.UpgradeService.loadUpgrades
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
 import org.brewcode.hamster.util.configureSession
+import org.brewcode.hamster.util.sec
 import org.brewcode.hamster.view.main.MainView
 import org.brewcode.hamster.view.main.MainView.coinsAmount
 import org.brewcode.hamster.view.mine.MineView
@@ -27,27 +30,27 @@ object GameMineAction {
 
     fun goToSection(section: UpgradeSection) {
         when (section) {
-            UpgradeSection.Markets -> MineView.topMenuBlock.markets.click()
-            UpgradeSection.PrTeam -> MineView.topMenuBlock.prTeam.click()
-            UpgradeSection.Legal -> MineView.topMenuBlock.legal.click()
-            UpgradeSection.SpecialsMy -> {
+            Markets -> MineView.topMenuBlock.markets.click()
+            PrTeam -> MineView.topMenuBlock.prTeam.click()
+            Legal -> MineView.topMenuBlock.legal.click()
+            SpecialsMy -> {
                 MineView.topMenuBlock.specials.click()
                 MineView.additionalMenuBlock.myCards.click()
             }
 
-            UpgradeSection.SpecialsNew -> {
+            SpecialsNew -> {
                 MineView.topMenuBlock.specials.click()
                 MineView.additionalMenuBlock.newCards.click()
             }
 
-            UpgradeSection.None -> throw IllegalArgumentException("Cannot go to section: $section")
+            None -> throw IllegalArgumentException("Cannot go to section: $section")
         }
     }
 
     fun loadCards(section: UpgradeSection): MutableMap<String, Upgrade> {
         val map = readSmallCards(section).toMutableMap()
         var index = 0
-        while (MainView.hamsterButton.has(Condition.hidden) && index < 10) {
+        while (MainView.hamsterButton.has(hidden) && index < 10) {
             scrollToLastVisibleCard(section)
             map.putAll(readSmallCards(section, exclude = map.keys))
             index++
@@ -56,43 +59,52 @@ object GameMineAction {
         return map
     }
 
-    fun buyUpgradeCard(upgrade: Upgrade): Upgrade {
-        var card: SmallUpgradeCard? = findSmallCard(upgrade)
+    fun buyUpgradeCard(upgrade: Upgrade, dryRun: Boolean = false): Upgrade {
+        var card: SmallUpgradeCard? = findSmallCard(upgrade, dryRun)
         var index = 0
-        while (MainView.hamsterButton.has(Condition.hidden) && index < 10 && card == null) {
+        while (MainView.hamsterButton.has(hidden) && index < 10 && card == null) {
             scrollToLastVisibleCard(upgrade.section)
-            card = findSmallCard(upgrade)
+            card = findSmallCard(upgrade, dryRun)
             index++
         }
 
         if (card == null) {
-            logger.error { "Cannot find card for $upgrade" }
+            logger.error { "Cannot find card after scrolling... $upgrade" }
             return upgrade
         }
 
         try {
             card.openCard()
         } catch (err: Throwable) {
-            logger.error { "Cannot open card for $upgrade" }
+            logger.error { "Card found. But cannot be open: $err... $upgrade" }
             return upgrade
         }
 
         val fullCard = UpgradeFullCardBlock(upgrade.name)
-        fullCard.actionButton.shouldBe(Condition.visible)
+        try {
+            fullCard.actionButton.shouldBe(visible, 5.sec)
+        } catch (err: Throwable) {
+            logger.error { "Click on card but it is not open. It's unavailable because countdown ... $upgrade" }
+            return upgrade
+        }
 
         val btnText = fullCard.actionButton.text
         if (btnText != "Go ahead") {
-            logger.info { "Button: ${btnText.ifBlank { ". . ." }}! Need update data or wait: $upgrade" }
+            logger.info { "Button text: '${btnText.ifBlank { ". . ." }}'! Need update data or wait: $upgrade" }
             goToBack()
             return upgrade
         }
 
-        fullCard.actionButton.click()
+        if (!dryRun) {
+            fullCard.actionButton.click()
+            fullCard.actionButton.shouldBe(hidden)
+        } else
+            fullCard.actionButton.shouldBe(clickable)
+
         if (fullCard.actionButton.isDisplayed)
             runCatching { fullCard.actionButton.text == "Take the prize" }
                 .onSuccess { fullCard.actionButton.click() }
 
-        fullCard.actionButton.shouldBe(Condition.hidden)
         logger.info { "Bought upgrade! $upgrade" }
         UpgradeService.saveToHistory(upgrade)
         return card.toUpgrade(upgrade)
@@ -140,7 +152,35 @@ object GameMineAction {
 
 fun main() {
     configureSession()
-    chooseAndBuyUpgrades()
-    // GameMineAction.buyUpgradeCard(Upgrade(UpgradeSection.PrTeam, "Meme coins", 1, 1, 1, 1, ""))
-    // GameMineAction.buyUpgradeCard(Upgrade(UpgradeSection.PrTeam, "Tokenomics expert", 1, 1, 1, 1, ""))
+
+    goToMine()
+    goToSection(SpecialsMy)
+    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "YouTube Gold Button", 1, 1, 1, 1, ""), true)
+    GameCommonAction.goToExchange()
+
+    goToMine()
+    goToSection(SpecialsMy)
+    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "Bitcoin Pizza Day", 1, 1, 1, 1, ""), true)
+    GameCommonAction.goToExchange()
+
+    goToMine()
+    goToSection(Markets)
+    GameMineAction.buyUpgradeCard(Upgrade(Markets, "Derivatives", 1, 1, 1, 1, ""), true)
+    GameCommonAction.goToExchange()
+
+    goToMine()
+    goToSection(PrTeam)
+    GameMineAction.buyUpgradeCard(Upgrade(PrTeam, "Marketing", 1, 1, 1, 1, ""), true)
+    GameCommonAction.goToExchange()
+
+    goToMine()
+    goToSection(PrTeam)
+    GameMineAction.buyUpgradeCard(Upgrade(PrTeam, "Consensus Explorer pass", 1, 1, 1, 1, ""), true)
+    GameCommonAction.goToExchange()
+
+    goToMine()
+    goToSection(SpecialsMy)
+    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "Hamster daily show", 1, 1, 1, 1, ""), true)
+    GameCommonAction.goToExchange()
+
 }

@@ -8,6 +8,8 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.lang.Thread.sleep
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 fun Int.rnd(left: Number = -20, right: Number = 20) = this + (left.toInt()..right.toInt()).random()
 fun Long.rnd(left: Number = -20, right: Number = 20) = this + (left.toInt()..right.toInt()).random()
@@ -56,3 +58,5 @@ fun progress(prefix: String = "Progress", interval: Long = 1_000): AtomicBoolean
 
     return continueAction
 }
+
+val Int.sec get() = this.seconds.toJavaDuration()

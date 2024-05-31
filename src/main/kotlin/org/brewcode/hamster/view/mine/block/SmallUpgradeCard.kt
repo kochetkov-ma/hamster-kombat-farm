@@ -1,6 +1,6 @@
 package org.brewcode.hamster.view.mine.block
 
-import com.codeborne.selenide.Condition
+import com.codeborne.selenide.Condition.clickable
 import org.brewcode.hamster.service.Upgrade
 import org.brewcode.hamster.service.UpgradeSection
 import org.brewcode.hamster.util.*
@@ -19,8 +19,8 @@ open class SmallUpgradeCard(
     open val needs = element(xpath(selfXpath.xChild("android.widget.TextView[4]")))
 
     fun openCard() {
-        runCatching { name.click() }
-            .onFailure { level.click() }
+        if (name.has(clickable) && cost.has(clickable)) self.click()
+        else throw IllegalStateException("Cannot open card. Card overlapped by other element. Name or Cost are not clickable: $this")
     }
 
     open fun toUpgrade(fromPreviousLevel: Upgrade = Upgrade.none, extName: String = ""): Upgrade = fromPreviousLevel
@@ -31,7 +31,7 @@ open class SmallUpgradeCard(
             totalProfit = if (profit.isDisplayed) profit.text.money() else 0,
             cost = if (cost.isDisplayed) cost.text.money() else Int.MAX_VALUE,
             needText = if (needs.isDisplayed) needs.text else "",
-            isUnlocked = self.has(Condition.clickable)
+            isUnlocked = self.has(clickable)
         )
         .let { it.copy(relativeProfit = if (fromPreviousLevel.totalProfit > 0) it.totalProfit - fromPreviousLevel.totalProfit else 0) }
 }

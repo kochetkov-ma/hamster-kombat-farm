@@ -96,7 +96,7 @@ object UpgradeService {
         GameCommonAction.goToMine()
         goToSection(upgrade.section)
         val newUpgrade = runCatching { buyUpgradeCard(upgrade) }
-            .onFailure { logger.error(it) { "Error during buy upgrade: $upgrade" } }
+            .onFailure { logger.error { "Error during buy upgrade: $upgrade" } }
             .getOrThrow()
         currentUpgrades[upgrade.name] = newUpgrade
 

@@ -1,7 +1,7 @@
 package org.brewcode.hamster.view.mine
 
 import com.codeborne.selenide.CollectionCondition
-import com.codeborne.selenide.Condition
+import com.codeborne.selenide.Condition.visible
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.service.Upgrade
 import org.brewcode.hamster.service.UpgradeSection
@@ -11,7 +11,6 @@ import org.brewcode.hamster.view.base.GameView
 import org.brewcode.hamster.view.mine.MineView.X.cardsXpath
 import org.brewcode.hamster.view.mine.MineView.X.specialCardsXpath
 import org.brewcode.hamster.view.mine.MineView.findSmallCard
-import org.brewcode.hamster.view.mine.MineView.readSmallCards
 import org.brewcode.hamster.view.mine.block.*
 
 private val logger = KotlinLogging.logger {}
@@ -61,14 +60,14 @@ object MineView : GameView() {
             if (section.isSpecial) specialCards.shouldHave(CollectionCondition.sizeGreaterThan(0))
             else cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
 
-        val lastVisible = visibleCards.filter(Condition.visible).last()
+        val lastVisible = visibleCards.filter(visible).last()
         val lastVisibleIndex = visibleCards.indexOf(lastVisible)
 
-        lastVisible.scrollTo(TopMenuBlock.self)
+        lastVisible.scrollTo(TopMenuBlock.self, lastVisible.size.height)
         logger.debug { "Last visible has index $lastVisibleIndex of ${visibleCards.size()}. Scroll successful!" }
     }
 
-    fun findSmallCard(upgrade: Upgrade): SmallUpgradeCard? {
+    fun findSmallCard(upgrade: Upgrade, dryRun: Boolean = false): SmallUpgradeCard? {
         val tmp =
             if (upgrade.section in arrayOf(UpgradeSection.SpecialsMy, UpgradeSection.SpecialsNew)) specialCards.shouldHave(CollectionCondition.sizeGreaterThan(0))
             else cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
@@ -83,6 +82,7 @@ object MineView : GameView() {
                 else SmallUpgradeCard(upgrade.section, cardsXpath.xIndex(i))
             }
             .filter { it.name.isDisplayed && it.level.isDisplayed }
+            .onEach { if (dryRun) logger.info { "Check visible card: " + it.name.text } }
             .find { it.name.text == upgrade.name }
             ?.also { logger.info { "Card found: ${upgrade.name}" } }
     }

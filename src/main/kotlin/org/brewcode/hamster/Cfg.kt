@@ -7,7 +7,7 @@ import kotlin.time.Duration.Companion.minutes
 object Cfg {
 
     /** Farming execution duration */
-    val timeout = 8.hours
+    val timeout = 12.hours
 
     /** Period of stamina check. Click iterations number */
     const val stamina_check_period = 5
@@ -26,17 +26,17 @@ object Cfg {
     /**
      * If your laptop is not connected to power source you can move mouse to prevent sleep mode.
      */
-    const val auto_move_mouse = false
+    const val auto_move_mouse = true
 
     /**
      * Name of upgrade to buy and ignore others till buy. After reaching target_upgrade will buy others.
      */
-    val desire_upgrades =  listOf<String>()
-    val exclude_upgrades = listOf("YouTube Gold Button")
+    val desire_upgrades: List<String> = listOf()
+    val exclude_upgrades: List<String> = listOf()
 
     const val time_priority = false
 
-    const val upgrade_cost_factor = 2.0
+    const val upgrade_cost_factor = 1.5
     const val upgrade_cost_backpressure_factor = 1.5
 
     override fun toString(): String {
