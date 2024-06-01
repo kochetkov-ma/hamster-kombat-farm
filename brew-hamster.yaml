@@ -1,0 +1,3 @@
+appium:
+  deviceName: emulator-5554
+  platformVersion: 14

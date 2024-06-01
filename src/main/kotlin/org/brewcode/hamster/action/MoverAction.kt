@@ -26,6 +26,6 @@ object MoverAction {
         robot.mouseMove(ThreadLocalRandom.current().nextInt(100, 1000), ThreadLocalRandom.current().nextInt(100, 1000))
         robot.delay(ThreadLocalRandom.current().nextInt(1000, 2000))
 
-        logger.debug { "Mouse moved!" }
+        logger.trace { "Mouse moved!" }
     }
 }

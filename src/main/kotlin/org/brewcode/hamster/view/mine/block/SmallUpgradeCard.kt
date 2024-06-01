@@ -12,6 +12,7 @@ open class SmallUpgradeCard(
 ) {
     val self = element(xpath(selfXpath))
     val image = element(xpath(selfXpath.xChild("android.view.View[1]")))
+    open val countdown = element(xpath(selfXpath.xChild("android.view.View[1]").xChild("android.widget.TextView")))
     open val name = element(xpath(selfXpath.xChild("android.widget.TextView[1]")))
     open val profit = element(xpath(selfXpath.xChild("android.view.View[2]").xAnyChild("android.widget.TextView")))
     open val level = element(xpath(selfXpath.xChild("android.widget.TextView[3]")))
@@ -19,7 +20,7 @@ open class SmallUpgradeCard(
     open val needs = element(xpath(selfXpath.xChild("android.widget.TextView[4]")))
 
     fun openCard() {
-        if (name.has(clickable) && cost.has(clickable)) self.click()
+        if (name.has(clickable) && cost.has(clickable)) name.click()
         else throw IllegalStateException("Cannot open card. Card overlapped by other element. Name or Cost are not clickable: $this")
     }
 

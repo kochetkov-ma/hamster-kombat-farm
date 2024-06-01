@@ -1,0 +1,86 @@
+<configuration>
+
+    <logger name="org.brewcode.hamster" level="trace"/>
+    <logger name="com.codeborne.selenide" level="error"/>
+    <logger name="io.appium" level="error"/>
+    <logger name="service" level="error"/>
+    <logger name="appium" level="error"/>
+
+    <appender name="ERROR_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%d{HH:mm:ss} %logger{0} - %boldRed(%msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="WARN_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%d{HH:mm:ss} %logger{0} - %yellow(%msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="INFO_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%d{HH:mm:ss} %logger{0} - %boldGreen(%msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="DEBUG_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%d{HH:mm:ss} %logger{0} - %blue(%msg) %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="TRACE_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>TRACE</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%d{HH:mm:ss} %logger{0} - %white(%msg) %n</pattern>
+        </encoder>
+    </appender>
+
+
+    <!-- %black - черный
+    %red - красный
+    %green - зеленый
+    %yellow - желтый
+    %blue - синий
+    %magenta - пурпурный (фиолетовый)
+    %cyan - голубой (бирюзовый)
+    %white - белый
+    %gray - серый
+    %boldRed - ярко-красный (жирный красный)
+    %boldGreen - ярко-зеленый (жирный зеленый)
+    %boldYellow - ярко-желтый (жирный желтый)
+    %boldBlue - ярко-синий (жирный синий)
+    %boldMagenta - ярко-пурпурный (жирный пурпурный)
+    %boldCyan - ярко-голубой (жирный бирюзовый)
+    %boldWhite - ярко-белый (жирный белый) -->
+
+    <root level="info">
+        <appender-ref ref="ERROR_STDOUT"/>
+        <appender-ref ref="WARN_STDOUT"/>
+        <appender-ref ref="INFO_STDOUT"/>
+        <appender-ref ref="DEBUG_STDOUT"/>
+        <appender-ref ref="TRACE_STDOUT"/>
+    </root>
+
+</configuration>

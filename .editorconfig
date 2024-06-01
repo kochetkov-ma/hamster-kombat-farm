@@ -13,3 +13,6 @@ max_line_length = 180
 max_line_length = 200
 disabled_rules = import-ordering
 continuation_indent_size = 4
+
+[*.yaml]
+indent_size = 2

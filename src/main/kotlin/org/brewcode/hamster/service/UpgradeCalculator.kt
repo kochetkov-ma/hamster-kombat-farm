@@ -22,8 +22,9 @@ data class UpgradeCalculator(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    fun costBackPressureFactorUp() {
+    fun costBackPressureFactorUp(): Double {
         costBackPressureFactor *= upgrade_cost_backpressure_factor
+        return costBackPressureFactor
     }
 
     fun exclude(vararg upgrades: String) = exclude.addAll(upgrades)
@@ -50,7 +51,7 @@ data class UpgradeCalculator(
         val hitSmartRelative = mostProfitable.hasRelative()
         val smartFilteredAndSortedUpgrades = if (hitSmartRelative) filteredAndSortedUpgrades.filter { it.value.hasRelative() } else filteredAndSortedUpgrades
 
-        logger.info { "Calculating... Hit smart relative: ${mostProfitable.hasRelative()}. Limit: $costRange. Suitable upgrades(${filteredUpgrades.size}): ${filteredUpgrades.values.shortString()}" }
+        logger.debug { "Calculating... Hit smart relative: ${mostProfitable.hasRelative()}. Limit: $costRange. Suitable upgrades(${filteredUpgrades.size}): ${filteredUpgrades.values.shortString()}" }
 
         val target = smartFilteredAndSortedUpgrades.maxByOrNull {
             if (it.value.withTimerPriority())

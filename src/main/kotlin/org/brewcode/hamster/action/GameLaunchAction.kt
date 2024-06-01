@@ -13,7 +13,7 @@ object GameLaunchAction {
     private val logger = KotlinLogging.logger {}
 
     fun reload(fast: Boolean = true) {
-        logger.info { "Reloading game session (fast=$fast)..." }
+        logger.debug { "Reloading game session (fast=$fast)..." }
         retry("Reloading")
             .maxAttempts(2)
             .onFail {
@@ -48,7 +48,7 @@ object GameLaunchAction {
 
     private fun waitLoading() {
         val hm = MainView
-        logger.info { "Lading..." }
+        logger.trace { "Lading..." }
         Thread.sleep(2_500)
 
         hm.startBlock.roadmap.should(Condition.disappear, 60.seconds.toJavaDuration())

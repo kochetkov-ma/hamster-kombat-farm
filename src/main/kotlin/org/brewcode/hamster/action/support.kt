@@ -49,10 +49,10 @@ data class ExecutionStatistic(
 
     fun updateIterations() = iterations++
     fun printStatistic() =
-        println(
-            " > > > execution: ${elapsedMs.sec} / ${remainingMs.sec} sec | profit:$profitText | earned profit:$profitEarned | profit increment per 10min:$profitIncrementPer10Minutes" +
+        logger.debug {
+            " > > > progress: ${elapsedMs.sec} / ${remainingMs.sec} sec | profit:$profitText | earned profit:$profitEarned | profit increment per 10min:$profitIncrementPer10Minutes" +
                 "| coins:$coinsAmount | earned coins:$coinsEarned | coins per sec:$coinsPerSecond | clicks:$clicks | iterations:$iterations"
-        )
+        }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

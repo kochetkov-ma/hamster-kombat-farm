@@ -6,12 +6,12 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.Cfg
 import org.brewcode.hamster.Cfg.staminaWaitInterval
 import org.brewcode.hamster.Cfg.stamina_check_period
+import org.brewcode.hamster.Cfg.upgrade_enabled
 import org.brewcode.hamster.action.GameBoostAction.boostStamina
 import org.brewcode.hamster.action.GameCommonAction.goToBack
 import org.brewcode.hamster.action.GameCommonAction.goToExchange
 import org.brewcode.hamster.action.GameEarnAction.tryDailyEarn
 import org.brewcode.hamster.action.GameMineAction.chooseAndBuyUpgrades
-import org.brewcode.hamster.service.UpgradeService
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
 import org.brewcode.hamster.util.Retryer.Companion.retry
 import org.brewcode.hamster.util.progress
@@ -38,14 +38,14 @@ object GameFarmAction {
                     statistic.printStatistic()
 
                 val stamina = MainView.staminaLevel()
-                if (stamina.second == 0) println("ERROR STAMINA: " + MainView.staminaText.text)
-                logger.info { "Check Stamina: $stamina" }
+                if (stamina.second == 0) logger.error { "ERROR STAMINA: " + MainView.staminaText.text }
+                logger.trace { "Check Stamina: $stamina" }
 
                 if (stamina.first < Cfg.stamina_minimum_level) {
                     GameLaunchAction.reload()
 
                     if (MainView.staminaLevel().first < Cfg.stamina_minimum_level + 500) {
-                        logger.info { "Try use boost..." }
+                        logger.debug { "Try use boost..." }
                         boostStamina()
 
                         runCatching { MainView.hamsterButton.shouldBe(Condition.visible) }
@@ -61,21 +61,22 @@ object GameFarmAction {
                                 .action { tryDailyEarn() }
                                 .evaluate()
 
-                            retry("Choose and buy upgrades")
-                                .ignoreErrors()
-                                .onFail {
-                                    if (TelegramView.searchButton.isDisplayed || TelegramView.searchInput.isDisplayed || TelegramView.playButton.isDisplayed) {
-                                        logger.info { "Game crushed and now Telegram view open" }
-                                        TelegramAction.closeTelegram()
-                                        TelegramAction.openTelegram()
-                                        if (TelegramAction.openHamsterBot())
-                                            GameLaunchAction.loadTheGameFromBotChat()
-                                    } else goToBack()
+                            if (upgrade_enabled)
+                                retry("Choose and buy upgrades")
+                                    .ignoreErrors()
+                                    .onFail {
+                                        if (TelegramView.searchButton.isDisplayed || TelegramView.searchInput.isDisplayed || TelegramView.playButton.isDisplayed) {
+                                            logger.error { "Game crushed and now Telegram view open" }
+                                            TelegramAction.closeTelegram()
+                                            TelegramAction.openTelegram()
+                                            if (TelegramAction.openHamsterBot())
+                                                GameLaunchAction.loadTheGameFromBotChat()
+                                        } else goToBack()
 
-                                    goToExchange()
-                                }
-                                .action { chooseAndBuyUpgrades() }
-                                .evaluate()
+                                        goToExchange()
+                                    }
+                                    .action { chooseAndBuyUpgrades() }
+                                    .evaluate()
                             statistic.printStatistic()
 
                             if (statistic.iterations % (stamina_check_period * 10) == 0)

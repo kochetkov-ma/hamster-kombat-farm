@@ -26,7 +26,7 @@ object Cfg {
     /**
      * If your laptop is not connected to power source you can move mouse to prevent sleep mode.
      */
-    const val auto_move_mouse = true
+    const val auto_move_mouse = false
 
     /**
      * Name of upgrade to buy and ignore others till buy. After reaching target_upgrade will buy others.
@@ -36,8 +36,9 @@ object Cfg {
 
     const val time_priority = false
 
+    const val upgrade_enabled = false
     const val upgrade_cost_factor = 1.5
-    const val upgrade_cost_backpressure_factor = 1.5
+    const val upgrade_cost_backpressure_factor = 1.25
 
     override fun toString(): String {
         return """

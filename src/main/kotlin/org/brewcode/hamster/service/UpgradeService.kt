@@ -44,17 +44,26 @@ object UpgradeService {
         currentUpgrades = info.readText().let { if (it.isEmpty()) mutableMapOf() else it.fromJson<MutableMap<String, Upgrade>>() }
     }
 
-    private fun loadAndSaveNewSection(section: UpgradeSection) {
-        loadCards(section).map { (newName, newUpgrade) ->
-            currentUpgrades.computeIfPresent(newName) { _, oldUpgrade ->
-
-                val oldHasRProfit = oldUpgrade.relativeProfit > 0
+    fun loadAndSaveNewSection(section: UpgradeSection) {
+        val upgradesFromApp = loadCards(section).map { (newName, newUpgrade) ->
+            val existing = currentUpgrades[newName]
+            newName to if (existing != null) {
                 val newHasNotRProfit = newUpgrade.relativeProfit == 0
+                val oldHasRProfit = existing.relativeProfit > 0
+                if (oldHasRProfit && newHasNotRProfit) newUpgrade.copy(relativeProfit = existing.relativeProfit) else newUpgrade
+            } else
+                newUpgrade
+        }.toMap()
 
-                if (oldHasRProfit && newHasNotRProfit) newUpgrade.copy(relativeProfit = oldUpgrade.relativeProfit) else newUpgrade
-
-            } ?: currentUpgrades.put(newName, newUpgrade)
+        val upgradesFromAppNames = upgradesFromApp.keys
+        val incorrect = currentUpgrades.filter { it.value.section == section }.filter { it.key !in upgradesFromAppNames }
+        if (incorrect.isNotEmpty()) {
+            logger.warn { "Found incorrect or deprecated upgrades. Will be removed: $incorrect" }
+            incorrect.keys.forEach { currentUpgrades.remove(it) }
         }
+
+        logger.trace { "Save upgrades from APP: $upgradesFromApp" }
+        currentUpgrades.putAll(upgradesFromApp)
     }
 
     fun saveToFile() {
@@ -66,15 +75,15 @@ object UpgradeService {
 
         GameCommonAction.goToMine()
 
-        logger.info { "Read upgrade section: $Markets" }
+        logger.debug { "Read upgrade section: $Markets" }
         goToSection(Markets)
         loadAndSaveNewSection(Markets)
 
-        logger.info { "Read upgrade section: $PrTeam" }
+        logger.debug { "Read upgrade section: $PrTeam" }
         goToSection(PrTeam)
         loadAndSaveNewSection(PrTeam)
 
-        logger.info { "Read upgrade section: $Legal" }
+        logger.debug { "Read upgrade section: $Legal" }
         goToSection(Legal)
         loadAndSaveNewSection(Legal)
 
@@ -82,11 +91,11 @@ object UpgradeService {
         goToSection(SpecialsMy)
         loadAndSaveNewSection(SpecialsMy)
 
-        logger.info { "Read upgrade section: $SpecialsNew" }
+        logger.debug { "Read upgrade section: $SpecialsNew" }
         goToSection(SpecialsNew)
         loadAndSaveNewSection(SpecialsNew)
 
-        logger.info { "All section read successfully" }
+        logger.info { "All section read successfully!" }
         GameCommonAction.goToExchange()
 
         saveToFile()
@@ -101,7 +110,7 @@ object UpgradeService {
         currentUpgrades[upgrade.name] = newUpgrade
 
         saveToFile()
-        logger.info { "Upgrade next level will be: $newUpgrade" }
+        logger.debug { "Upgrade next level will be: $newUpgrade" }
 
         return newUpgrade != upgrade
     }

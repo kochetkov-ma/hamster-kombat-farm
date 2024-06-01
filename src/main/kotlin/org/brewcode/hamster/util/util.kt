@@ -1,15 +1,22 @@
 package org.brewcode.hamster.util
 
+import com.codeborne.selenide.WebDriverRunner
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import io.appium.java_client.android.AndroidDriver
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.lang.Thread.sleep
+import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
+
+private val logger = KotlinLogging.logger {}
 
 fun Int.rnd(left: Number = -20, right: Number = 20) = this + (left.toInt()..right.toInt()).random()
 fun Long.rnd(left: Number = -20, right: Number = 20) = this + (left.toInt()..right.toInt()).random()
@@ -53,10 +60,17 @@ fun progress(prefix: String = "Progress", interval: Long = 1_000): AtomicBoolean
             sleep(1_000)
             tenMs += interval
         }
-        println("Finished in ${tenMs / 1000} sec")
+        println()
+        logger.info { "Waiting finished! in ${tenMs / 1000} sec" }
     }
 
     return continueAction
 }
 
 val Int.sec get() = this.seconds.toJavaDuration()
+
+val yaml = ObjectMapper(YAMLFactory()).registerKotlinModule()
+
+inline fun <reified T> Path.fromYaml(): T = yaml.readValue(toFile())
+
+val android get() = (WebDriverRunner.getWebDriver() as AndroidDriver)

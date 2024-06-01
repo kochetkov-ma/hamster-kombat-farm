@@ -29,6 +29,7 @@ object GameMineAction {
     private val logger = KotlinLogging.logger {}
 
     fun goToSection(section: UpgradeSection) {
+        logger.debug { "Go to section: $section" }
         when (section) {
             Markets -> MineView.topMenuBlock.markets.click()
             PrTeam -> MineView.topMenuBlock.prTeam.click()
@@ -63,7 +64,7 @@ object GameMineAction {
         var card: SmallUpgradeCard? = findSmallCard(upgrade, dryRun)
         var index = 0
         while (MainView.hamsterButton.has(hidden) && index < 10 && card == null) {
-            scrollToLastVisibleCard(upgrade.section)
+            scrollToLastVisibleCard(upgrade.section, dryRun)
             card = findSmallCard(upgrade, dryRun)
             index++
         }
@@ -90,7 +91,7 @@ object GameMineAction {
 
         val btnText = fullCard.actionButton.text
         if (btnText != "Go ahead") {
-            logger.info { "Button text: '${btnText.ifBlank { ". . ." }}'! Need update data or wait: $upgrade" }
+            logger.warn { "Button text: '${btnText.ifBlank { ". . ." }}'! Need update data or wait: $upgrade" }
             goToBack()
             return upgrade
         }
@@ -98,12 +99,20 @@ object GameMineAction {
         if (!dryRun) {
             fullCard.actionButton.click()
             fullCard.actionButton.shouldBe(hidden)
-        } else
+        } else {
             fullCard.actionButton.shouldBe(clickable)
+            goToBack()
+        }
 
-        if (fullCard.actionButton.isDisplayed)
-            runCatching { fullCard.actionButton.text == "Take the prize" }
-                .onSuccess { fullCard.actionButton.click() }
+        if (fullCard.actionButton.isDisplayed && fullCard.actionButton.text == "Take the prize") {
+            if (!dryRun) {
+                fullCard.actionButton.click()
+                fullCard.actionButton.shouldBe(hidden)
+            } else {
+                fullCard.actionButton.shouldBe(clickable)
+                goToBack()
+            }
+        }
 
         logger.info { "Bought upgrade! $upgrade" }
         UpgradeService.saveToHistory(upgrade)
@@ -122,27 +131,30 @@ object GameMineAction {
 
         var toBuy = if (UpgradeService.hasToBuy()) UpgradeService.toBuy() else calculator.calculate(coins)
         if (toBuy.needSaveMoney(coins)) {
-            logger.info { "Found upgrade to need save coins a few iterations. Let's saving [$coins / ${toBuy.cost}] for: $toBuy" }
+            logger.warn { "Found upgrade to need save coins a few iterations. Let's saving [$coins / ${toBuy.cost}] for: $toBuy" }
             GameCommonAction.goToExchange()
             UpgradeService.toBuy(toBuy)
             return
         }
 
         while (toBuy.canBuy(coins)) {
-            logger.info { "Have money for upgrade [$coins / ${toBuy.cost}]: $toBuy" }
+            logger.debug { "Have money for upgrade [$coins / ${toBuy.cost}]: $toBuy" }
 
             val result = runCatching { buyUpgrade(toBuy) }.getOrElse { false }.also { UpgradeService.clearToBuy() }
             if (!result) {
-                logger.info { "Buy upgrade fail... Add to exclude" }
+                logger.warn { "Buy upgrade fail... Add to exclude" }
                 calculator.exclude(toBuy.name)
-                calculator.costBackPressureFactorUp()
+                if (toBuy.cost > coins) {
+                    val newLimit = calculator.costBackPressureFactorUp()
+                    logger.debug { "Reduce maximum cost limit down to: $newLimit" }
+                }
             }
             GameCommonAction.goToExchange()
             coins = coinsAmount()
             toBuy = calculator.calculate(coins)
         }
 
-        logger.info { "Not enough coins [$coins / ${toBuy.cost}] for: $toBuy" }
+        logger.warn { "Not enough coins [$coins / ${toBuy.cost}] for: $toBuy" }
         GameCommonAction.goToExchange()
     }
 
@@ -153,34 +165,54 @@ object GameMineAction {
 fun main() {
     configureSession()
 
-    goToMine()
-    goToSection(SpecialsMy)
-    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "YouTube Gold Button", 1, 1, 1, 1, ""), true)
-    GameCommonAction.goToExchange()
+    // Hamster Kombat takes the lead
+    // Mega Event
 
     goToMine()
     goToSection(SpecialsMy)
-    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "Bitcoin Pizza Day", 1, 1, 1, 1, ""), true)
+    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "Top 10 Global Ranking", 1, 1, 1, 1, ""), true)
+    goToBack()
     GameCommonAction.goToExchange()
 
     goToMine()
-    goToSection(Markets)
-    GameMineAction.buyUpgradeCard(Upgrade(Markets, "Derivatives", 1, 1, 1, 1, ""), true)
-    GameCommonAction.goToExchange()
-
-    goToMine()
-    goToSection(PrTeam)
-    GameMineAction.buyUpgradeCard(Upgrade(PrTeam, "Marketing", 1, 1, 1, 1, ""), true)
+    goToSection(SpecialsMy)
+    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "Special Hamster Conference", 1, 1, 1, 1, ""), true)
+    goToBack()
     GameCommonAction.goToExchange()
 
     goToMine()
     goToSection(PrTeam)
     GameMineAction.buyUpgradeCard(Upgrade(PrTeam, "Consensus Explorer pass", 1, 1, 1, 1, ""), true)
+    goToBack()
+    GameCommonAction.goToExchange()
+
+    goToMine()
+    goToSection(SpecialsMy)
+    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "YouTube Gold Button", 1, 1, 1, 1, ""), true)
+    goToBack()
+    GameCommonAction.goToExchange()
+
+    goToMine()
+    goToSection(SpecialsMy)
+    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "Bitcoin Pizza Day", 1, 1, 1, 1, ""), true)
+    goToBack()
+    GameCommonAction.goToExchange()
+
+    goToMine()
+    goToSection(Markets)
+    GameMineAction.buyUpgradeCard(Upgrade(Markets, "Derivatives", 1, 1, 1, 1, ""), true)
+    goToBack()
+    GameCommonAction.goToExchange()
+
+    goToMine()
+    goToSection(PrTeam)
+    GameMineAction.buyUpgradeCard(Upgrade(PrTeam, "Marketing", 1, 1, 1, 1, ""), true)
+    goToBack()
     GameCommonAction.goToExchange()
 
     goToMine()
     goToSection(SpecialsMy)
     GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "Hamster daily show", 1, 1, 1, 1, ""), true)
+    goToBack()
     GameCommonAction.goToExchange()
-
 }

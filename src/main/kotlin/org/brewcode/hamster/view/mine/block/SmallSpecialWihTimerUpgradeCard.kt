@@ -1,5 +1,6 @@
 package org.brewcode.hamster.view.mine.block
 
+import com.codeborne.selenide.appium.SelenideAppiumElement
 import org.brewcode.hamster.service.Upgrade
 import org.brewcode.hamster.service.UpgradeSection
 import org.brewcode.hamster.util.*
@@ -11,6 +12,7 @@ open class SmallSpecialWihTimerUpgradeCard(
 ) : SmallSpecialUpgradeCard(section, selfXpath) {
     val timer = element(selfXpath.xChild("android.view.View").xChild("android.widget.TextView").xBy())
     override val name = element(selfXpath.xChild("android.widget.TextView[1]").xBy())
+    override val countdown: SelenideAppiumElement = element(selfXpath.xChild("android.view.View[2]").xChild("android.widget.TextView").xBy())
     override val profit = element(xpath(selfXpath.xChild("android.view.View[3]").xAnyChild("android.widget.TextView").xIndex(2)))
     override val level = element(xpath(selfXpath.xChild("android.view.View[4]").xChild("android.widget.TextView[1]")))
     override val cost = element(xpath(selfXpath.xChild("android.view.View[4]").xChild("android.view.View").xAnyChild("android.widget.TextView[1]")))

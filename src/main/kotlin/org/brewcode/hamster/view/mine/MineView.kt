@@ -40,31 +40,35 @@ object MineView : GameView() {
             else cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
 
         return (1..tmp.size())
-            .map { i ->
-                if (section.isSpecial)
-                    if (SmallSpecialWihTimerUpgradeCard.isSpecialWihTimer(specialCardsXpath.xIndex(i)))
-                        SmallSpecialWihTimerUpgradeCard(section, specialCardsXpath.xIndex(i))
-                    else
-                        SmallSpecialUpgradeCard(section, specialCardsXpath.xIndex(i))
-                else SmallUpgradeCard(section, cardsXpath.xIndex(i))
-            }
+            .map { cardElement(section, it) }
             .filter { it.level.isDisplayed }
-            .associateBy { it.name.text.also { logger.info { "Upgrade card saved: $it" } } }
+            .associateBy { it.name.text.also { logger.debug { "Upgrade card saved: $it" } } }
             .filterKeys { it.contains(searchName) && it !in exclude }
             .map { it.key to it.value.toUpgrade(extName = it.key) }
             .toMap()
     }
 
-    fun scrollToLastVisibleCard(section: UpgradeSection) {
-        val visibleCards =
-            if (section.isSpecial) specialCards.shouldHave(CollectionCondition.sizeGreaterThan(0))
-            else cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
+    fun scrollToLastVisibleCard(section: UpgradeSection, dryRun: Boolean = false) {
+        val fastVisibleCards =
+            (if (section.isSpecial) specialCards.shouldHave(CollectionCondition.sizeGreaterThan(0))
+            else cards.shouldHave(CollectionCondition.sizeGreaterThan(0))).filter(visible)
 
-        val lastVisible = visibleCards.filter(visible).last()
-        val lastVisibleIndex = visibleCards.indexOf(lastVisible)
+        val fastLastVisible = fastVisibleCards.last()
+        var fastLastVisibleIndex = fastVisibleCards.indexOf(fastVisibleCards.last())
 
-        lastVisible.scrollTo(TopMenuBlock.self, lastVisible.size.height)
-        logger.debug { "Last visible has index $lastVisibleIndex of ${visibleCards.size()}. Scroll successful!" }
+        val slowCard = cardElement(section, fastLastVisibleIndex)
+        val slowCardVisible = slowCard.name.isDisplayed && slowCard.cost.isDisplayed
+
+        if (slowCardVisible)
+            fastLastVisible.scrollTo(TopMenuBlock.markets, false)
+        else {
+            fastLastVisibleIndex = fastVisibleCards.size() - 3
+            val prevRowVisible = fastVisibleCards[fastLastVisibleIndex]
+            prevRowVisible.scrollTo(TopMenuBlock.markets, true)
+        }
+
+        if (dryRun)
+            logger.trace { "Last visible has index $fastLastVisibleIndex of ${fastVisibleCards.size()}. Scroll successful!" }
     }
 
     fun findSmallCard(upgrade: Upgrade, dryRun: Boolean = false): SmallUpgradeCard? {
@@ -73,19 +77,20 @@ object MineView : GameView() {
             else cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
 
         return (1..tmp.size())
-            .map { i ->
-                if (upgrade.section.isSpecial)
-                    if (SmallSpecialWihTimerUpgradeCard.isSpecialWihTimer(specialCardsXpath.xIndex(i)))
-                        SmallSpecialWihTimerUpgradeCard(upgrade.section, specialCardsXpath.xIndex(i))
-                    else
-                        SmallSpecialUpgradeCard(upgrade.section, specialCardsXpath.xIndex(i))
-                else SmallUpgradeCard(upgrade.section, cardsXpath.xIndex(i))
-            }
+            .map { cardElement(upgrade.section, it) }
             .filter { it.name.isDisplayed && it.level.isDisplayed }
-            .onEach { if (dryRun) logger.info { "Check visible card: " + it.name.text } }
+            .onEach { if (dryRun) logger.trace { "Check visible card: " + it.name.text } }
             .find { it.name.text == upgrade.name }
-            ?.also { logger.info { "Card found: ${upgrade.name}" } }
+            ?.also { logger.debug { "Card found: ${upgrade.name}" } }
     }
+
+    private fun cardElement(section: UpgradeSection, index: Int) =
+        if (section.isSpecial)
+            if (SmallSpecialWihTimerUpgradeCard.isSpecialWihTimer(specialCardsXpath.xIndex(index)))
+                SmallSpecialWihTimerUpgradeCard(section, specialCardsXpath.xIndex(index))
+            else
+                SmallSpecialUpgradeCard(section, specialCardsXpath.xIndex(index))
+        else SmallUpgradeCard(section, cardsXpath.xIndex(index))
 }
 
 fun main() {

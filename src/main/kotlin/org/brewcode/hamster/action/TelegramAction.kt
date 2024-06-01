@@ -7,8 +7,11 @@ import io.appium.java_client.android.AndroidDriver
 import io.appium.java_client.android.nativekey.AndroidKey
 import io.appium.java_client.android.nativekey.KeyEvent
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.brewcode.hamster.action.TelegramAction.closeTelegram
+import org.brewcode.hamster.action.GameLaunchAction.loadTheGameFromBotChat
+import org.brewcode.hamster.action.TelegramAction.openHamsterBot
+import org.brewcode.hamster.action.TelegramAction.openTelegram
 import org.brewcode.hamster.util.Retryer.Companion.retry
+import org.brewcode.hamster.util.android
 import org.brewcode.hamster.util.configureSession
 import org.brewcode.hamster.view.main.MainView
 import org.brewcode.hamster.view.tg.TelegramView
@@ -29,7 +32,7 @@ object TelegramAction {
             .delay(500)
             .action {
                 logger.info { "Closing Telegram..." }
-                (WebDriverRunner.getWebDriver() as AndroidDriver).pressKey(KeyEvent(AndroidKey.HOME))
+                android.pressKey(KeyEvent(AndroidKey.HOME))
                 TelegramView.searchInput.should(hidden)
                 logger.info { "Telegram Closed!" }
             }
@@ -63,7 +66,7 @@ object TelegramAction {
             return true
         }
 
-        logger.info { "Bot is not open. Try to find it..." }
+        logger.warn { "Bot is not open. Try to find it..." }
         telegramView.searchButton.click()
         telegramView.searchInput.sendKeys("@hamster_kombat_bot")
         telegramView.hamsterItem.click()
@@ -75,5 +78,7 @@ object TelegramAction {
 
 fun main() {
     configureSession()
-    closeTelegram()
+    openTelegram()
+    openHamsterBot()
+    loadTheGameFromBotChat()
 }

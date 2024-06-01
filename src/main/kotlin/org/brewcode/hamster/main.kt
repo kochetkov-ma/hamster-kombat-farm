@@ -21,8 +21,8 @@ private val logger = KotlinLogging.logger {}
 
 fun main() {
 
-    logger.info { "Starting..." }
-    logger.info { Cfg.toString() }
+    logger.debug { "Starting..." }
+    logger.debug { Cfg.toString() }
 
     configureSession()
 
@@ -41,7 +41,7 @@ fun main() {
         loadTheGameFromBotChat()
 
     var statistic = ExecutionStatistic(Cfg.timeout)
-    println("\n > > > Started at '${now()}' | duration: ${Cfg.timeout}  < < < \n")
+    logger.info { "Started at '${now()}' | duration: ${Cfg.timeout}" }
     statistic.printStatistic()
 
     retry("Main loop with Telegram reopening")
