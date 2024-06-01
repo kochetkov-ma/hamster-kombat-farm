@@ -17,7 +17,7 @@ object GameEarnAction {
     private val info = Path("build/daily.info").also {
         if (!it.exists()) it.writeText("")
 
-        logger.debug { "Daily info file: $it" }
+        logger.trace { "Daily info file: $it" }
     }
 
     fun tryDailyEarn(): Boolean {

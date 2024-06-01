@@ -88,7 +88,7 @@ object GameFarmAction {
                             runCatching { MainView.staminaText.shouldBe(text("$max / $max"), staminaWaitInterval.toJavaDuration()) }
                                 .onFailure {
                                     control.set(false)
-                                    logger.error { "Stamina is " + MainView.staminaLevel() + " after long wait " + staminaWaitInterval }
+                                    logger.warn { "Stamina is " + MainView.staminaLevel() + " after long wait " + staminaWaitInterval }
                                 }.onSuccess { control.set(false) }
                         }
                     }

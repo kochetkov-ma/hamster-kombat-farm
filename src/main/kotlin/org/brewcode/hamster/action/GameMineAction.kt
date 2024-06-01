@@ -93,27 +93,23 @@ object GameMineAction {
         if (btnText != "Go ahead") {
             logger.warn { "Button text: '${btnText.ifBlank { ". . ." }}'! Need update data or wait: $upgrade" }
             goToBack()
-            return upgrade
-        }
-
-        if (!dryRun) {
-            fullCard.actionButton.click()
-            fullCard.actionButton.shouldBe(hidden)
         } else {
-            fullCard.actionButton.shouldBe(clickable)
-            goToBack()
-        }
-
-        if (fullCard.actionButton.isDisplayed && fullCard.actionButton.text == "Take the prize") {
-            if (!dryRun) {
-                fullCard.actionButton.click()
-                fullCard.actionButton.shouldBe(hidden)
-            } else {
+            if (!dryRun) fullCard.actionButton.click()
+            else {
                 fullCard.actionButton.shouldBe(clickable)
                 goToBack()
             }
         }
 
+        if (fullCard.actionButton.has(text("Take the prize"), 2.sec)) {
+            if (!dryRun) fullCard.actionButton.click()
+            else {
+                fullCard.actionButton.shouldBe(clickable)
+                goToBack()
+            }
+        }
+
+        fullCard.actionButton.shouldBe(hidden)
         logger.info { "Bought upgrade! $upgrade" }
         UpgradeService.saveToHistory(upgrade)
         return card.toUpgrade(upgrade)
