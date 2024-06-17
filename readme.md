@@ -1,6 +1,8 @@
 Hamster Kombat | Free Farming Bot
 ---
 
+![img.png](img.png)
+
 - `Hamster Kombat`
 - `Free Farming Bot`
 - [`@hamster_kombat_farm_bot_free`](https://t.me/hamster_kombat_farm_bot_free)
@@ -23,10 +25,14 @@ Hamster Kombat | Free Farming Bot
 - Buy the most profitable Upgrades
 - Apply Daily Combo
 
+![img_1.png](img_1.png)
+
 ---
 
 ### Detailed install instructions 🚀 SOON 🚀
 Watch the [Telegram channel]((https://t.me/hamster_kombat_farm_bot_free)) and `YouTube channel` for updates.
+
+>
 
 ---
 
@@ -35,6 +41,7 @@ Watch the [Telegram channel]((https://t.me/hamster_kombat_farm_bot_free)) and `Y
 - `Android 14 SDK`
 - `Android Emulator or Other`
 - `NodeJS`
+- **`Set in Game Language to English`**
 
 ---
 
