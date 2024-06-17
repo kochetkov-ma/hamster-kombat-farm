@@ -1,10 +1,11 @@
-Hamster Kombat | Free Farming Bot
+Free Hamster Kombat Farming Bot | Hamster Kombat Auto Farm
 ---
 
 ![img.png](img.png)
 
 - `Hamster Kombat`
 - `Free Farming Bot`
+- `Hamster kombat farming bot`
 - [`@hamster_kombat_farm_bot_free`](https://t.me/hamster_kombat_farm_bot_free)
 
 ---
