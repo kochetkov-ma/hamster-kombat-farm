@@ -32,7 +32,7 @@ Watch the [Telegram channel]((https://t.me/hamster_kombat_farm_bot_free)) and `Y
 
 #### Requirements:
 - `Java 21`
-- `Android SDK API v14`
+- `Android 14 SDK`
 - `Android Emulator or Other`
 - `NodeJS`
 
