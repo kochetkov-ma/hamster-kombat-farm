@@ -13,7 +13,7 @@ val String.xParent get() = "$this/.."
 fun String.xAncestor(tag: String = "*", index: Int = 1) = "$this/ancestor::$tag[$index]"
 
 fun String.xSiblingPrev(index: Int, tag: String = "*") = "$this/preceding-sibling::$tag[$index]"
-fun String.xSibling(index: Int) = "$this/following-sibling::*[$index]"
+fun String.xSibling(index: Int, tag: String = "*") = "$this/following-sibling::$tag[$index]"
 
 fun String.xChild(tag: String) = "$this/$tag"
 fun String.xChildTxt(text: String, tag: String = "*") = "$this/$tag[text()='$text']"

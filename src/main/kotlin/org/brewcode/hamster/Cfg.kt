@@ -1,55 +1,62 @@
 package org.brewcode.hamster
 
+import org.brewcode.hamster.util.BrewConfiguration
+import org.brewcode.hamster.util.fromYaml
+import kotlin.io.path.Path
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 @Suppress("ConstPropertyName")
 object Cfg {
 
+    private val yaml = Path("brew-hamster.yaml").fromYaml<BrewConfiguration>()
+
     /** Farming execution duration */
-    val timeout = 12.hours
+    val timeout = yaml.hamster.timeoutHours.hours
 
     /** Period of stamina check. Click iterations number */
-    const val stamina_check_period = 5
+    val stamina_check_period = yaml.advanced.staminaCheckPeriodSec
 
     /** Level of stamina/energy when stop clicking and do another tasks */
-    const val stamina_minimum_level = 250
+    val stamina_minimum_level = yaml.advanced.staminaMinimumLevel
 
     /** Wait duration for stamina/energy recover */
-    val staminaWaitInterval = 10.minutes
+    val stamina_wait_interval = yaml.hamster.staminaWaitIntervalMin.minutes
 
-    /**
-     * Minimum cost of upgrade
-     */
-    const val min_cost = 0
+    /** Minimum cost of upgrade */
+    val min_cost = yaml.hamster.minCost
 
-    /**
-     * If your laptop is not connected to power source you can move mouse to prevent sleep mode.
-     */
-    const val auto_move_mouse = true
+    /** If your laptop is not connected to power source you can move mouse to prevent sleep mode. */
+    val auto_move_mouse = yaml.hamster.autoMoveMouse
 
-    /**
-     * Name of upgrade to buy and ignore others till buy. After reaching target_upgrade will buy others.
-     */
-    val desire_upgrades: List<String> = listOf()
-    val exclude_upgrades: List<String> = listOf()
+    /** Automatically buy upgrade. Or save money */
+    val buy_upgrades = yaml.hamster.buyUpgrades
 
-    const val time_priority = false
+    /** Combo. Name of upgrade to buy and ignore others till buy. After reaching target_upgrade will buy others */
+    val desire_upgrades: List<String> = yaml.hamster.desireUpgrades
 
-    const val upgrade_enabled = true
-    const val upgrade_cost_factor = 1.10
-    const val upgrade_cost_backpressure_factor = 1.0
+    /** Exclude upgrades from buying */
+    val exclude_upgrades: List<String> = yaml.hamster.excludeUpgrades
+
+    /** Maximum cost of upgrade to save extra money. Coins amount * upgrade_cost_factor */
+    val upgrade_cost_factor = yaml.hamster.upgradeCostFactor
+
+    /** Maximum cost of upgrade to save extra money. Coins amount * upgrade_cost_factor */
+    val upgrade_cost_backpressure_factor = yaml.advanced.upgradeCostBackpressureFactor
 
     override fun toString(): String {
         return """
         |timeout=$timeout
-        |staminaCheckPeriod=$stamina_check_period
-        |staminaMinimumLevel=$stamina_minimum_level
-        |staminaWaitInterval=$staminaWaitInterval
-        |upgrade_cost_factor=$upgrade_cost_factor
+        |stamina_check_period=$stamina_check_period
+        |stamina_minimum_level=$stamina_minimum_level
+        |stamina_wait_interval=$stamina_wait_interval
         |min_cost=$min_cost
         |auto_move_mouse=$auto_move_mouse
+        |buy_upgrades=$buy_upgrades
         |target_upgrade='$desire_upgrades'
+        |exclude_upgrades='$exclude_upgrades'
+        |upgrade_cost_factor=$upgrade_cost_factor
+        |upgrade_cost_backpressure_factor=$upgrade_cost_backpressure_factor
     """.trimMargin()
     }
 }

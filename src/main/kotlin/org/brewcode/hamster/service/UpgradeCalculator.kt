@@ -3,7 +3,6 @@ package org.brewcode.hamster.service
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.Cfg.exclude_upgrades
 import org.brewcode.hamster.Cfg.min_cost
-import org.brewcode.hamster.Cfg.time_priority
 import org.brewcode.hamster.Cfg.upgrade_cost_backpressure_factor
 import org.brewcode.hamster.Cfg.upgrade_cost_factor
 
@@ -53,12 +52,7 @@ data class UpgradeCalculator(
 
         logger.debug { "Calculating... Hit smart relative: ${mostProfitable.hasRelative()}. Limit: $costRange. Suitable upgrades(${filteredUpgrades.size}): ${filteredUpgrades.values.shortString()}" }
 
-        val target = smartFilteredAndSortedUpgrades.maxByOrNull {
-            if (it.value.withTimerPriority())
-                it.value.comparingValue(hitSmartRelative) * 5
-            else
-                it.value.comparingValue(hitSmartRelative)
-        }?.value ?: Upgrade.none
+        val target = smartFilteredAndSortedUpgrades.maxByOrNull { it.value.comparingValue(hitSmartRelative) }?.value ?: Upgrade.none
 
         logger.info { "Calculated! Target upgrade: $target " }
         desireUpgradesToBuy.remove(target.name)
@@ -70,7 +64,6 @@ data class UpgradeCalculator(
     private fun Upgrade.doesntNeedOtherUpgrade() = needText.isBlank() && needUpgrade == null
     private fun Upgrade.hasRelative() = relativeTotalMargin > 0
     private fun Upgrade.comparingValue(useRelative: Boolean = false) = if (useRelative) relativeTotalMargin else totalMargin
-    private fun Upgrade.withTimerPriority() = if (time_priority) timer.isNotBlank() else false
     private fun Upgrade.shortString() = "$name=$cost[$totalProfit:$totalMargin or $relativeProfit:$relativeTotalMargin]"
     private fun Collection<Upgrade>.shortString() = joinToString(", ") { it.shortString() }
 

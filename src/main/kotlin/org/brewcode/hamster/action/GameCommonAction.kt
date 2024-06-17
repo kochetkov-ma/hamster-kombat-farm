@@ -14,9 +14,12 @@ private val logger = KotlinLogging.logger {}
 
 object GameCommonAction {
 
-    fun goToBack() {
+    fun goToBack(useKey: Boolean = true) {
         logger.debug { "Go to BACK..." }
-        android.pressKey(KeyEvent(AndroidKey.BACK))
+        if (useKey)
+            android.pressKey(KeyEvent(AndroidKey.BACK))
+        else
+            MainView.navigation.backButton.click()
     }
 
     fun goToExchange() {

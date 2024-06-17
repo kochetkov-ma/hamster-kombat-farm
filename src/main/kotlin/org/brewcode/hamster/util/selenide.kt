@@ -7,7 +7,6 @@ import com.codeborne.selenide.appium.SelenideAppiumCollection
 import com.codeborne.selenide.appium.SelenideAppiumElement
 import org.openqa.selenium.By
 
-
 fun element(by: By): SelenideAppiumElement = SelenideAppium.`$`(by)
 fun elements(by: By): SelenideAppiumCollection = SelenideAppium.`$$`(by)
 

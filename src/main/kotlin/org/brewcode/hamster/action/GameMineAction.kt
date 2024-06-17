@@ -11,18 +11,19 @@ import org.brewcode.hamster.service.UpgradeSection
 import org.brewcode.hamster.service.UpgradeSection.*
 import org.brewcode.hamster.service.UpgradeService
 import org.brewcode.hamster.service.UpgradeService.buyUpgrade
-import org.brewcode.hamster.service.UpgradeService.loadUpgrades
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
 import org.brewcode.hamster.util.configureSession
 import org.brewcode.hamster.util.sec
 import org.brewcode.hamster.view.main.MainView
 import org.brewcode.hamster.view.main.MainView.coinsAmount
 import org.brewcode.hamster.view.mine.MineView
+import org.brewcode.hamster.view.mine.MineView.dailyComboCardFound
 import org.brewcode.hamster.view.mine.MineView.findSmallCard
 import org.brewcode.hamster.view.mine.MineView.readSmallCards
 import org.brewcode.hamster.view.mine.MineView.scrollToLastVisibleCard
 import org.brewcode.hamster.view.mine.block.SmallUpgradeCard
 import org.brewcode.hamster.view.mine.block.UpgradeFullCardBlock
+import kotlin.time.Duration.Companion.seconds
 
 object GameMineAction {
 
@@ -94,8 +95,10 @@ object GameMineAction {
             logger.warn { "Button text: '${btnText.ifBlank { ". . ." }}'! Need update data or wait: $upgrade" }
             goToBack()
         } else {
-            if (!dryRun) fullCard.actionButton.click()
-            else {
+            if (!dryRun) {
+                fullCard.actionButton.click()
+                logger.info { "Bought upgrade! $upgrade" }
+            } else {
                 fullCard.actionButton.shouldBe(clickable)
                 goToBack()
             }
@@ -109,15 +112,17 @@ object GameMineAction {
             }
         }
 
+        if (dailyComboCardFound.has(visible, 2.sec)) {
+            logger.info { "Daily Combo Card!" }
+            goToBack(useKey = false)
+        }
+
         fullCard.actionButton.shouldBe(hidden)
-        logger.info { "Bought upgrade! $upgrade" }
         UpgradeService.saveToHistory(upgrade)
         return card.toUpgrade(upgrade)
     }
 
     fun chooseAndBuyUpgrades() {
-        loadUpgrades()
-
         if (UpgradeService.isEmptyUpgradesCache)
             updateUpgrades()
 
@@ -165,50 +170,9 @@ fun main() {
     // Mega Event
 
     goToMine()
-    goToSection(SpecialsMy)
-    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "Top 10 Global Ranking", 1, 1, 1, 1, ""), true)
-    goToBack()
-    GameCommonAction.goToExchange()
-
-    goToMine()
-    goToSection(SpecialsMy)
-    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "Special Hamster Conference", 1, 1, 1, 1, ""), true)
-    goToBack()
-    GameCommonAction.goToExchange()
-
-    goToMine()
     goToSection(PrTeam)
-    GameMineAction.buyUpgradeCard(Upgrade(PrTeam, "Consensus Explorer pass", 1, 1, 1, 1, ""), true)
+    GameMineAction.buyUpgradeCard(Upgrade(PrTeam, "IT team", 1, 1, 1, 1, ""), true)
     goToBack()
     GameCommonAction.goToExchange()
 
-    goToMine()
-    goToSection(SpecialsMy)
-    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "YouTube Gold Button", 1, 1, 1, 1, ""), true)
-    goToBack()
-    GameCommonAction.goToExchange()
-
-    goToMine()
-    goToSection(SpecialsMy)
-    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "Bitcoin Pizza Day", 1, 1, 1, 1, ""), true)
-    goToBack()
-    GameCommonAction.goToExchange()
-
-    goToMine()
-    goToSection(Markets)
-    GameMineAction.buyUpgradeCard(Upgrade(Markets, "Derivatives", 1, 1, 1, 1, ""), true)
-    goToBack()
-    GameCommonAction.goToExchange()
-
-    goToMine()
-    goToSection(PrTeam)
-    GameMineAction.buyUpgradeCard(Upgrade(PrTeam, "Marketing", 1, 1, 1, 1, ""), true)
-    goToBack()
-    GameCommonAction.goToExchange()
-
-    goToMine()
-    goToSection(SpecialsMy)
-    GameMineAction.buyUpgradeCard(Upgrade(SpecialsMy, "Hamster daily show", 1, 1, 1, 1, ""), true)
-    goToBack()
-    GameCommonAction.goToExchange()
 }

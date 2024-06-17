@@ -8,11 +8,13 @@ import org.brewcode.hamster.action.GameMineAction.buyUpgradeCard
 import org.brewcode.hamster.action.GameMineAction.goToSection
 import org.brewcode.hamster.action.GameMineAction.loadCards
 import org.brewcode.hamster.service.UpgradeSection.*
+import org.brewcode.hamster.service.UpgradeService.loadAndSaveNewSection
 import org.brewcode.hamster.service.UpgradeService.loadUpgrades
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
 import org.brewcode.hamster.util.configureSession
 import org.brewcode.hamster.util.fromJson
 import org.brewcode.hamster.util.toJson
+import org.brewcode.hamster.view.mine.MineView.dailyComboApplyButton
 import java.time.LocalDateTime
 import kotlin.io.path.*
 
@@ -26,6 +28,10 @@ object UpgradeService {
     var upgradeToBuy: Upgrade? = null
     val desireUpgrades = Cfg.desire_upgrades.toMutableList()
     val isEmptyUpgradesCache get() = currentUpgrades.isEmpty()
+
+    init {
+        loadUpgrades()
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -66,7 +72,7 @@ object UpgradeService {
         currentUpgrades.putAll(upgradesFromApp)
     }
 
-    fun saveToFile() {
+    private fun saveToFile() {
         val sorted = currentUpgrades.toList().sortedBy { it.second.totalMargin }.reversed().toMap()
         info.writeText(sorted.toJson())
     }
@@ -107,11 +113,11 @@ object UpgradeService {
         val newUpgrade = runCatching { buyUpgradeCard(upgrade) }
             .onFailure { logger.error { "Error during buy upgrade: $upgrade" } }
             .getOrThrow()
+
         currentUpgrades[upgrade.name] = newUpgrade
-
         saveToFile()
-        logger.debug { "Upgrade next level will be: $newUpgrade" }
 
+        logger.debug { "Upgrade next level will be: $newUpgrade" }
         return newUpgrade != upgrade
     }
 
@@ -120,6 +126,10 @@ object UpgradeService {
     }
 
     fun upgradeCalculator() = UpgradeCalculator(currentUpgrades, desireUpgrades)
+}
+
+fun applyCombo() {
+    dailyComboApplyButton
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,6 +178,10 @@ enum class UpgradeSection(vararg path: String) {
 
 fun main() {
     configureSession()
-    loadUpgrades()
     updateUpgrades()
+
+//    loadUpgrades()
+//    logger.info { "Read upgrade section: $SpecialsMy" }
+//    goToSection(Markets)
+//    loadAndSaveNewSection(Markets)
 }

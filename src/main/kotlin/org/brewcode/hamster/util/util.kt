@@ -40,7 +40,7 @@ fun String.money() = when (last().uppercaseChar()) {
     'K' -> double() * 1000
     'M' -> double() * 1000000
     'B' -> double() * 1000000000
-    else -> double()
+    else -> replace(",", "").toDouble()
 }.toInt()
 
 fun Throwable.rootCause(): Throwable {

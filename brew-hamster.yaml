@@ -1,3 +1,21 @@
 appium:
-  deviceName: emulator-5554
-  platformVersion: 14
+  automationName: UiAutomator2   # For Android
+  deviceName: emulator-5554      # Replace with your device name
+  platformName: Android          # Can also be iOS
+  platformVersion: 14            # Replace with your Android version
+
+hamster:
+  timeoutHours: 12                 # Finish after this time
+  staminaWaitIntervalMin: 10      # Wait time to recover stamina
+  minCost: 0                      # Minimum upgrade cost threshold
+  autoMoveMouse: true             # Automatically move mouse during downtime for Laptop
+  buyUpgrades: false               # Whether to purchase upgrades
+  # Daily Combo
+  desireUpgrades: [ "IT team", "Meme coins" ]
+  excludeUpgrades: [ "" ]
+  upgradeCostFactor: 1.5          # Maximum upgrade cost factor: Coins * factor = max cost to save
+
+advanced:
+  staminaCheckPeriodSec: 5            # How often to check stamina
+  staminaMinimumLevel: 50             # Minimum stamina level to try to get boost
+  upgradeCostBackpressureFactor: 1.10 # Fine-tune upgrade spending based on cost

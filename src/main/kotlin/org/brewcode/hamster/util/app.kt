@@ -58,7 +58,9 @@ fun configureSession() {
 //  platformVersion: 14
 
 data class BrewConfiguration(
-    val appium: Appium
+    val appium: Appium,
+    val hamster: Hamster,
+    val advanced: Advanced
 )
 
 data class Appium(
@@ -67,6 +69,23 @@ data class Appium(
     val platformName: String?,
     val platformVersion: String?,
     val newCommandTimeout: Long?
+)
+
+data class Hamster(
+    val timeoutHours: Int,
+    val staminaWaitIntervalMin: Int,
+    val minCost: Int,
+    val autoMoveMouse: Boolean,
+    val buyUpgrades: Boolean,
+    val desireUpgrades: List<String> = listOf(),
+    val excludeUpgrades: List<String> = listOf(),
+    val upgradeCostFactor: Double = 1.5
+)
+
+data class Advanced(
+    val staminaCheckPeriodSec: Int,
+    val staminaMinimumLevel: Int,
+    val upgradeCostBackpressureFactor: Double
 )
 
 fun main() {

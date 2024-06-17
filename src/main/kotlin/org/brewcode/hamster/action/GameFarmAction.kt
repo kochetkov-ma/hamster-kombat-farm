@@ -4,9 +4,9 @@ import com.codeborne.selenide.Condition
 import com.codeborne.selenide.Condition.text
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.Cfg
-import org.brewcode.hamster.Cfg.staminaWaitInterval
+import org.brewcode.hamster.Cfg.stamina_wait_interval
 import org.brewcode.hamster.Cfg.stamina_check_period
-import org.brewcode.hamster.Cfg.upgrade_enabled
+import org.brewcode.hamster.Cfg.buy_upgrades
 import org.brewcode.hamster.action.GameBoostAction.boostStamina
 import org.brewcode.hamster.action.GameCommonAction.goToBack
 import org.brewcode.hamster.action.GameCommonAction.goToExchange
@@ -61,7 +61,7 @@ object GameFarmAction {
                                 .action { tryDailyEarn() }
                                 .evaluate()
 
-                            if (upgrade_enabled)
+                            if (buy_upgrades)
                                 retry("Choose and buy upgrades")
                                     .ignoreErrors()
                                     .onFail {
@@ -82,13 +82,13 @@ object GameFarmAction {
                             if (statistic.iterations % (stamina_check_period * 10) == 0)
                                 updateUpgrades()
 
-                            logger.info { "Wait [$staminaWaitInterval] till entire refresh..." }
+                            logger.info { "Wait [$stamina_wait_interval] till entire refresh..." }
 
                             val control = progress()
-                            runCatching { MainView.staminaText.shouldBe(text("$max / $max"), staminaWaitInterval.toJavaDuration()) }
+                            runCatching { MainView.staminaText.shouldBe(text("$max / $max"), stamina_wait_interval.toJavaDuration()) }
                                 .onFailure {
                                     control.set(false)
-                                    logger.warn { "Stamina is " + MainView.staminaLevel() + " after long wait " + staminaWaitInterval }
+                                    logger.warn { "Stamina is " + MainView.staminaLevel() + " after long wait " + stamina_wait_interval }
                                 }.onSuccess { control.set(false) }
                         }
                     }

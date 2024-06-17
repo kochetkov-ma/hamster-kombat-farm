@@ -16,6 +16,9 @@ object MainView : GameView() {
     val availableButton = element(ByAndroidUIAutomator("new UiSelector().textContains(\"available\")"))
     val profit = element(xText("Profit per hour").xSibling(1).xChild("android.widget.TextView").xBy())
 
+    val dailyCipher = element(xText("Daily cipher", "android.widget.TextView").xBy())
+    val earnPerTap = element(xText("Earn per tap").xBy())
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     val startBlock = StartBlock
