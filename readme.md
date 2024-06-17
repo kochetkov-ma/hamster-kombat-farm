@@ -45,4 +45,4 @@ Watch the [Telegram channel]((https://t.me/hamster_kombat_farm_bot_free)) and `Y
 - No SLA and Fast support
 - I don't have resource for marketing, process payments and deal with user issues
 
-But it woks and I
+But it woks and I support / fix / update it
