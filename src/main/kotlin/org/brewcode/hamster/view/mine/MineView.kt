@@ -6,6 +6,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.service.Upgrade
 import org.brewcode.hamster.service.UpgradeSection
 import org.brewcode.hamster.service.UpgradeSection.Companion.isSpecial
+import org.brewcode.hamster.service.UpgradeSection.SpecialsNew
 import org.brewcode.hamster.util.*
 import org.brewcode.hamster.view.base.GameView
 import org.brewcode.hamster.view.mine.MineView.X.cardsXpath
@@ -38,7 +39,9 @@ object MineView : GameView() {
 
     fun readSmallCards(section: UpgradeSection, searchName: String = "", exclude: Collection<String> = emptyList()): Map<String, Upgrade> {
         val tmp =
-            if (section.isSpecial) specialCards.shouldHave(CollectionCondition.sizeGreaterThan(0))
+            if (section.isSpecial)
+                if (section == SpecialsNew) runCatching { specialCards.shouldHave(CollectionCondition.sizeGreaterThan(0), 2.sec) }.getOrElse { specialCards }
+                else specialCards.shouldHave(CollectionCondition.sizeGreaterThan(0))
             else cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
 
         return (1..tmp.size())
@@ -75,7 +78,7 @@ object MineView : GameView() {
 
     fun findSmallCard(upgrade: Upgrade, dryRun: Boolean = false): SmallUpgradeCard? {
         val tmp =
-            if (upgrade.section in arrayOf(UpgradeSection.SpecialsMy, UpgradeSection.SpecialsNew)) specialCards.shouldHave(CollectionCondition.sizeGreaterThan(0))
+            if (upgrade.section in arrayOf(UpgradeSection.SpecialsMy, SpecialsNew)) specialCards.shouldHave(CollectionCondition.sizeGreaterThan(0))
             else cards.shouldHave(CollectionCondition.sizeGreaterThan(0))
 
         return (1..tmp.size())

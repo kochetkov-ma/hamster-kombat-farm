@@ -14,6 +14,7 @@ import org.brewcode.hamster.service.UpgradeService.buyUpgrade
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
 import org.brewcode.hamster.util.configureSession
 import org.brewcode.hamster.util.sec
+import org.brewcode.hamster.view.base.GameView.CommonBlock.takeThePrize
 import org.brewcode.hamster.view.main.MainView
 import org.brewcode.hamster.view.main.MainView.coinsAmount
 import org.brewcode.hamster.view.mine.MineView
@@ -23,7 +24,6 @@ import org.brewcode.hamster.view.mine.MineView.readSmallCards
 import org.brewcode.hamster.view.mine.MineView.scrollToLastVisibleCard
 import org.brewcode.hamster.view.mine.block.SmallUpgradeCard
 import org.brewcode.hamster.view.mine.block.UpgradeFullCardBlock
-import kotlin.time.Duration.Companion.seconds
 
 object GameMineAction {
 
@@ -104,17 +104,20 @@ object GameMineAction {
             }
         }
 
-        if (fullCard.actionButton.has(text("Take the prize"), 2.sec)) {
-            if (!dryRun) fullCard.actionButton.click()
-            else {
-                fullCard.actionButton.shouldBe(clickable)
-                goToBack()
-            }
+        if (dailyComboCardFound.has(visible, 2.sec)) {
+            logger.info { "New Daily Combo Card!" }
+            if (!dryRun) {
+                dailyComboCardFound.click()
+                dailyComboCardFound.shouldBe(hidden)
+            } else dailyComboCardFound.shouldBe(clickable)
         }
 
-        if (dailyComboCardFound.has(visible, 2.sec)) {
-            logger.info { "Daily Combo Card!" }
-            goToBack(useKey = false)
+        if (takeThePrize.has(visible, 2.sec)) {
+            logger.info { "Daily Combo: COLLECTED!" }
+            if (!dryRun) {
+                takeThePrize.click()
+                takeThePrize.shouldBe(hidden)
+            } else takeThePrize.shouldBe(clickable)
         }
 
         fullCard.actionButton.shouldBe(hidden)
@@ -165,14 +168,18 @@ object GameMineAction {
 
 fun main() {
     configureSession()
+    val dryRun = false
+    if (takeThePrize.has(visible, 2.sec)) {
+        if (!dryRun) {
+            takeThePrize.click()
+            takeThePrize.shouldBe(hidden)
+        } else takeThePrize.shouldBe(clickable)
+    }
 
-    // Hamster Kombat takes the lead
-    // Mega Event
-
-    goToMine()
-    goToSection(PrTeam)
-    GameMineAction.buyUpgradeCard(Upgrade(PrTeam, "IT team", 1, 1, 1, 1, ""), true)
-    goToBack()
-    GameCommonAction.goToExchange()
+//    goToMine()
+//    goToSection(PrTeam)
+//    GameMineAction.buyUpgradeCard(Upgrade(PrTeam, "IT team", 1, 1, 1, 1, ""), true)
+//    goToBack()
+//    GameCommonAction.goToExchange()
 
 }

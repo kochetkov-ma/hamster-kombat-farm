@@ -2,8 +2,10 @@ package org.brewcode.hamster.view.base
 
 import com.codeborne.selenide.Selenide.element
 import io.appium.java_client.AppiumBy.ByAndroidUIAutomator
+import org.brewcode.hamster.util.configureSession
 import org.brewcode.hamster.util.xBy
 import org.brewcode.hamster.util.xText
+import org.brewcode.hamster.view.base.GameView.CommonBlock.takeThePrize
 
 abstract class GameView {
 
@@ -21,6 +23,7 @@ abstract class GameView {
         val levelUpProcessing = element(ByAndroidUIAutomator("new UiSelector().textContains(\"Level up processing\")"))
         val goAheadButton = element(ByAndroidUIAutomator("new UiSelector().text(\"Go ahead\")"))
         val insufficientFunds = element(ByAndroidUIAutomator("new UiSelector().text(\"Insufficient funds\")"))
+        val takeThePrize = element(ByAndroidUIAutomator("new UiSelector().textContains(\"Take the prize\")"))
     }
 
     object NavigationBlock {
@@ -38,6 +41,9 @@ abstract class GameView {
         val earn = element(ByAndroidUIAutomator("new UiSelector().description(\"Earn\")"))
         val airdrop = element(ByAndroidUIAutomator("new UiSelector().description(\"Airdrop\")"))
     }
+}
 
-
+fun main() {
+    configureSession()
+    println(takeThePrize.isDisplayed)
 }

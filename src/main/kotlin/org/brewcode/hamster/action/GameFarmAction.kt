@@ -4,9 +4,9 @@ import com.codeborne.selenide.Condition
 import com.codeborne.selenide.Condition.text
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.brewcode.hamster.Cfg
-import org.brewcode.hamster.Cfg.stamina_wait_interval
-import org.brewcode.hamster.Cfg.stamina_check_period
 import org.brewcode.hamster.Cfg.buy_upgrades
+import org.brewcode.hamster.Cfg.stamina_check_period
+import org.brewcode.hamster.Cfg.stamina_wait_interval
 import org.brewcode.hamster.action.GameBoostAction.boostStamina
 import org.brewcode.hamster.action.GameCommonAction.goToBack
 import org.brewcode.hamster.action.GameCommonAction.goToExchange
@@ -42,7 +42,6 @@ object GameFarmAction {
                 logger.trace { "Check Stamina: $stamina" }
 
                 if (stamina.first < Cfg.stamina_minimum_level) {
-                    GameLaunchAction.reload()
 
                     if (MainView.staminaLevel().first < Cfg.stamina_minimum_level + 500) {
                         logger.debug { "Try use boost..." }
