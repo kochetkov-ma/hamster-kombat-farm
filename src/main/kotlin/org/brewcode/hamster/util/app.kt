@@ -72,6 +72,7 @@ data class Appium(
 )
 
 data class Hamster(
+    val updateUpgradesInfoOnStart: Boolean,
     val timeoutHours: Int,
     val staminaWaitIntervalMin: Int,
     val minCost: Int,

@@ -112,7 +112,7 @@ object GameMineAction {
             } else dailyComboCardFound.shouldBe(clickable)
         }
 
-        if (takeThePrize.has(visible, 2.sec)) {
+        if (takeThePrize.has(visible, 5.sec)) {
             logger.info { "Daily Combo: COLLECTED!" }
             if (!dryRun) {
                 takeThePrize.click()

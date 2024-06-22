@@ -11,6 +11,8 @@ object Cfg {
 
     private val yaml = Path("brew-hamster.yaml").fromYaml<BrewConfiguration>()
 
+    val updateUpgradesInfoOnStart = yaml.hamster.updateUpgradesInfoOnStart
+
     /** Farming execution duration */
     val timeout = yaml.hamster.timeoutHours.hours
 

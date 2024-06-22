@@ -11,6 +11,7 @@ import org.brewcode.hamster.action.GameBoostAction.boostStamina
 import org.brewcode.hamster.action.GameCommonAction.goToBack
 import org.brewcode.hamster.action.GameCommonAction.goToExchange
 import org.brewcode.hamster.action.GameEarnAction.tryDailyEarn
+import org.brewcode.hamster.action.GameLaunchAction.reload
 import org.brewcode.hamster.action.GameMineAction.chooseAndBuyUpgrades
 import org.brewcode.hamster.service.UpgradeService.updateUpgrades
 import org.brewcode.hamster.util.Retryer.Companion.retry
@@ -26,8 +27,12 @@ object GameFarmAction {
 
     fun farm(statistic: ExecutionStatistic): ExecutionStatistic {
 
+        if (Cfg.updateUpgradesInfoOnStart)
+            updateUpgrades()
+
         while (statistic.elapsedMs < statistic.duration.inWholeMilliseconds) {
             statistic.updateIterations()
+
             val clicks = 5
             repeat(clicks) { MainView.hamsterButton.clickLikeHuman() }
             statistic.updateClicks(clicks)
@@ -38,7 +43,7 @@ object GameFarmAction {
                     statistic.printStatistic()
 
                 val stamina = MainView.staminaLevel()
-                if (stamina.second == 0) logger.error { "ERROR STAMINA: " + MainView.staminaText.text }
+                if (stamina.second == 0) logger.error { "ERROR STAMINA: " + MainView.stamina.text }
                 logger.trace { "Check Stamina: $stamina" }
 
                 if (stamina.first < Cfg.stamina_minimum_level) {
@@ -78,13 +83,15 @@ object GameFarmAction {
                                     .evaluate()
                             statistic.printStatistic()
 
-                            if (statistic.iterations % (stamina_check_period * 10) == 0)
+                            if (statistic.iterations % (stamina_check_period * 10) == 0) {
+                                reload()
                                 updateUpgrades()
+                            }
 
                             logger.info { "Wait [$stamina_wait_interval] till entire refresh..." }
 
                             val control = progress()
-                            runCatching { MainView.staminaText.shouldBe(text("$max / $max"), stamina_wait_interval.toJavaDuration()) }
+                            runCatching { MainView.stamina.shouldBe(text("$max / $max"), stamina_wait_interval.toJavaDuration()) }
                                 .onFailure {
                                     control.set(false)
                                     logger.warn { "Stamina is " + MainView.staminaLevel() + " after long wait " + stamina_wait_interval }
