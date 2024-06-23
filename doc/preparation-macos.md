@@ -105,3 +105,5 @@ See latest version on https://nodejs.org/en/download/prebuilt-installer
   ![img_16.png](img_16.png)
 
 > Congratulations! You are ready to start the game!
+>
+> See further steps: **[Get Started](get-started.md)**
