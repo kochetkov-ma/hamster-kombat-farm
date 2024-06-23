@@ -34,52 +34,10 @@ Free Hamster Kombat Farming Bot | Hamster Kombat Auto Farm
 Watch the [Telegram channel]((https://t.me/hamster_kombat_farm_bot_free)) and `YouTube channel` for updates.
 
 #### Prepare Environment
-
-##### Download and install the latest version of Java 21
-- Apple(ARM) https://download.oracle.com/java/21/archive/jdk-21.0.2_macos-aarch64_bin.dmg
-- Intel(x64) https://download.oracle.com/java/21/archive/jdk-21.0.2_macos-x64_bin.dmg
-
-##### Download and install Android Studio
-See latest version on https://developer.android.com/studio
-- Apple(ARM) https://redirector.gvt1.com/edgedl/android/studio/install/2024.1.1.11/android-studio-2024.1.1.11-mac_arm.dmg
-- Intel(x64) https://redirector.gvt1.com/edgedl/android/studio/install/2024.1.1.11/android-studio-2024.1.1.11-mac.dmg
-
-##### Prepare Android SDK and create Emulator by Android Studio
-
-##### Set `ANDROID_HOME` Environment Variables
-- Open `Terminal`
-- run command: `open ~/.zshrc`
-- Add line: `export ANDROID_HOME=/Users/username/Library/Android/sdk`
-see detailed instruction: https://developer.android.com/tools/variables
-
-##### Run Emulator
-
-##### Install Telegram to Emulator and SignIn to your Account
-Download: https://telegram.org/dl/android/apk
-
-Install to Emulator by Drug and Drop:
-
-Telegram Icon Should be on First Screen
-
-Sign In to your Telegram Account with Hamster Kombat Game
-
-##### Download and Install NodeJS
-See latest version on https://nodejs.org/en/download/prebuilt-installer
-
-- Apple(ARM) https://nodejs.org/dist/v20.15.0/node-v20.15.0.pkg
-
-##### Install Appium by Terminal
-
-`sudo npm i --location=global appium`
+- [preparation-macos.md](doc%2Fpreparation-macos.md)
 
 #### Run Bot Java application
-
-##### Error
-```
-Exception in thread "main" org.openqa.selenium.SessionNotCreatedException: Could not start a new session. Response code 500.
-Message: An unknown server-side error occurred while processing the command.
-Original error: Neither ANDROID_HOME nor ANDROID_SDK_ROOT environment variable was exported. Read https://developer.android.com/studio/command-line/variables for more details
-```
+- [get-started.md](doc%2Fget-started.md)
 
 ---
 

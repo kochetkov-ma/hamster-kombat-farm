@@ -58,9 +58,12 @@ tasks.jar {
     }
 }
 
-tasks.named<Sync>("installDist") {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    include("hamster.*", "hamster", "brew-hamster.yaml", "upgrade.json")
+distributions {
+    main {
+        contents {
+            include("hamster.*", "hamster", "brew-hamster.yaml")
+        }
+    }
 }
 
 tasks.named<CreateStartScripts>("startScripts") {
@@ -68,7 +71,7 @@ tasks.named<CreateStartScripts>("startScripts") {
         copy {
             from(rootDir)
             into("$outputDir")
-            include("brew-hamster.yaml", "upgrade.json")
+            include("brew-hamster.yaml")
         }
     }
 }
