@@ -72,6 +72,8 @@ Install to Emulator by Drug and Drop:
 
 Sign In to your Telegram Account with Hamster Kombat Game
 
+> !!! **Set Game Language to English** !!!
+
 #### 6. Set `ANDROID_HOME` Environment Variables
 - Open `Terminal`
 

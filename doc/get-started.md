@@ -11,6 +11,8 @@
 - Run emulator create during [preparation-macos.md](preparation-macos.md)
 - Open Hamster Kombat Game in emulator
 
+> !!! **Set Game Language to English** !!!
+
 ## Download latest release
 - Go to: https://github.com/kochetkov-ma/hamster-kombat-farm/releases
 - And download latest `hamster.zip` (for example, not latest https://github.com/kochetkov-ma/hamster-kombat-farm/releases/download/v0.5.0/hamster.zip)
