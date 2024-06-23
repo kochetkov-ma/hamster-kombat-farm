@@ -10,6 +10,10 @@ Free Hamster Kombat Farming Bot | Hamster Kombat Auto Farm
 
 ---
 
+[TOC]
+
+---
+
 🚀 Fully Automated Bot for Hamster Kombat 🚀
 
 - 🤖 A fully automated bot has been created for farming, purchasing, upgrades, and completing missions in Hamster Combat.
@@ -34,10 +38,10 @@ Free Hamster Kombat Farming Bot | Hamster Kombat Auto Farm
 Watch the [Telegram channel]((https://t.me/hamster_kombat_farm_bot_free)) and `YouTube channel` for updates.
 
 #### Prepare Environment
-- [preparation-macos.md](doc%2Fpreparation-macos.md)
+- **[preparation for macos here](doc%2Fpreparation-macos.md)**
 
 #### Run Bot Java application
-- [get-started.md](doc%2Fget-started.md)
+- **[getting started / run bot here](doc%2Fget-started.md)**
 
 ---
 

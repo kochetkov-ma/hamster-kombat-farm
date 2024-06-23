@@ -49,12 +49,10 @@ See latest version on https://developer.android.com/studio
 - Select Image `API 35` and click `Next`
 
   ![img_9.png](img_9.png)
-- Then don't click `Finish` but click `Install Emulator` and wait for it
+- Then **don't click** `Finish` but click `Install Emulator` and wait for it
 
   ![img_10.png](img_10.png)
 - After installation click `Finish`
-
-  ![img_11.png](img_11.png)
 - Project opened and you should see your emulator `Medium Phone API 34` in `Device Manager`. Click `Run` button
 
   ![img_11.png](img_11.png)
