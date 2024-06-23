@@ -1,6 +1,7 @@
 package org.brewcode.hamster
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.brewcode.hamster.Cfg.cfgPath
 import org.brewcode.hamster.action.ExecutionStatistic
 import org.brewcode.hamster.action.GameFarmAction.farm
 import org.brewcode.hamster.action.GameLaunchAction.loadTheGameFromBotChat
@@ -14,6 +15,8 @@ import org.brewcode.hamster.util.configureSession
 import java.lang.Thread.sleep
 import java.time.LocalDateTime.now
 import java.util.concurrent.CompletableFuture
+import kotlin.io.path.Path
+import kotlin.io.path.notExists
 import kotlin.time.Duration.Companion.minutes
 
 
@@ -22,6 +25,15 @@ private val logger = KotlinLogging.logger {}
 fun main() {
 
     logger.debug { "Starting..." }
+
+    logger.info { "Current directory: " + Path(".").toAbsolutePath() }
+
+    if (cfgPath.notExists())
+        throw Error(
+            "EN: Configuration file not found: $cfgPath. Copy 'brew-hamster.yaml' from release archive to 'brew-hamster.yaml' and fill it by instruction!"
+                + "\nRU: Файл конфигурации не найден: $cfgPath. Скопируйте 'brew-hamster.yaml' из релиза в 'brew-hamster.yaml' и заполните его по инструкции!"
+        )
+
     logger.debug { Cfg.toString() }
 
     configureSession()

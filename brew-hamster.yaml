@@ -1,6 +1,6 @@
 appium:
   automationName: UiAutomator2   # For Android
-  deviceName: emulator-5554      # Replace with your device name
+  deviceName: ""                 # Replace with your device name
   platformName: Android          # Can also be iOS
   platformVersion: 14            # Replace with your Android version
 

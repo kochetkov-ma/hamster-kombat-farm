@@ -9,7 +9,9 @@ import kotlin.time.Duration.Companion.minutes
 @Suppress("ConstPropertyName")
 object Cfg {
 
-    private val yaml = Path("brew-hamster.yaml").fromYaml<BrewConfiguration>()
+    val cfgPath = Path("brew-hamster.yaml")
+
+    val yaml = cfgPath.fromYaml<BrewConfiguration>()
 
     val updateUpgradesInfoOnStart = yaml.hamster.updateUpgradesInfoOnStart
 

@@ -14,7 +14,7 @@ import kotlin.io.path.writeText
 object GameEarnAction {
     private val logger = KotlinLogging.logger {}
 
-    private val info = Path("build/daily.info").also {
+    private val info = Path("daily.info").also {
         if (!it.exists()) it.writeText("")
 
         logger.trace { "Daily info file: $it" }

@@ -7,7 +7,7 @@ import io.appium.java_client.android.AndroidDriver
 import io.appium.java_client.android.options.UiAutomator2Options
 import io.appium.java_client.service.local.AppiumDriverLocalService
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlin.io.path.Path
+import org.brewcode.hamster.Cfg.yaml
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
@@ -16,13 +16,11 @@ private val logger = KotlinLogging.logger {}
 
 fun configureSession() {
 
-    val cfg = Path("brew-hamster.yaml").fromYaml<BrewConfiguration>()
-
     val options = UiAutomator2Options()
-        .setAutomationName(cfg.appium.automationName ?: "UiAutomator2")
-        .setDeviceName(cfg.appium.deviceName)
-        .setPlatformName(cfg.appium.platformName ?: "Android")
-        .setPlatformVersion(cfg.appium.platformVersion ?: "14")
+        .setAutomationName(yaml.appium.automationName ?: "UiAutomator2")
+        .setDeviceName(yaml.appium.deviceName)
+        .setPlatformName(yaml.appium.platformName ?: "Android")
+        .setPlatformVersion(yaml.appium.platformVersion ?: "14")
         .setNewCommandTimeout(5.minutes.toJavaDuration())
 
     logger.debug { "Session starting... $options" }

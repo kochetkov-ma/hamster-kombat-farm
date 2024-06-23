@@ -22,8 +22,8 @@ private val logger = KotlinLogging.logger {}
 
 object UpgradeService {
 
-    private val info = Path("build/upgrade.json").also { if (!it.exists()) it.writeText("") }
-    private val history = Path("build/history.json").also { if (!it.exists()) it.writeText("") }
+    private val info = Path("upgrade.json").also { if (!it.exists()) it.writeText("") }
+    private val history = Path("history.json").also { if (!it.exists()) it.writeText("") }
     private var currentUpgrades = mutableMapOf<String, Upgrade>()
     var upgradeToBuy: Upgrade? = null
     val desireUpgrades = Cfg.desire_upgrades.toMutableList()
