@@ -1,6 +1,9 @@
 Free Hamster Kombat Farming Bot | Hamster Kombat Auto Farm
 ---
 
+(Crash doc)
+
+
 ![img.png](img.png)
 
 - `Hamster Kombat`
