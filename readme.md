@@ -1,4 +1,7 @@
 Free Hamster Kombat Farming Bot | Hamster Kombat Auto Farm
+
+Deprecated
+No Longer Support
 ---
 
 ![img.png](img.png)
